@@ -92,42 +92,16 @@ class NavKeys {
             (if direction = up, then above the current element, 
             if direction = right, then to the right of current element, etc.)
         */
-        let nav_area = {};
-        //Viewport width and height
-        const vw = document.documentElement.clientWidth;
-        const vh = document.documentElement.clientHeight;
-        //Current elements bounding box
-        const current_rect = this.current_element.getBoundingClientRect();
+        let nav_area = this.calculateNavArea(this.current_element, direction);
+        
+        
 
-        let target_elements = [];
+        //let target_elements = [];
 
-        //Set nav_area
-        if(direction === this.constants.direction.up){
-            nav_area.x = 0;
-            nav_area.y = 0;
-            nav_area.width = vw;
-            nav_area.height = current_rect.y;
-        }else if(direction === this.constants.direction.down){
-            nav_area.x = 0;
-            nav_area.y = current_rect.bottom;
-            nav_area.width = vw;
-            nav_area.height = vh - current_rect.bottom;
-        }else if(direction === this.constants.direction.left){
-            nav_area.x = 0;
-            nav_area.y = 0;
-            nav_area.width = current_rect.x;
-            nav_area.height = vh;
-        }else if(direction === this.constants.direction.right){
-            nav_area.x = current_rect.right;
-            nav_area.y = 0;
-            nav_area.width = vw - current_rect.right;
-            nav_area.height = vh;
-        }
+        
+        
 
         target_elements = this.getElementsInsideArea(this.nav_elements, nav_area);
-        //console.log("Target elements: ");
-        //console.log(target_elements);
-        //this.draw_nav_area(nav_area);
 
         const navigate_to = this.getClosestElementCenter(this.current_element, target_elements);
 
@@ -143,6 +117,7 @@ class NavKeys {
         this.current_element = element;
     }
 
+    //Draw nav area, for debug
     draw_nav_area(area){
         if(this.nav_area_element !== null){
             this.nav_area_element.remove();
@@ -164,6 +139,41 @@ class NavKeys {
     arr_remove_duplicates(arr){
         const uniq = [...new Set(arr)];
         return uniq;
+    }
+
+    //Calculates the nav area for target elements, based on direction
+    //element - HTMLelement relative to which to calculate
+    //direction - "up", "down", "left", "right"
+    calculateNavArea(element, direction){
+
+        //Element's bounding box
+        const current_rect = element.getBoundingClientRect();
+
+        //Document width and height
+        const dw = document.documentElement.clientWidth;
+        const dh = document.documentElement.clientHeight;
+
+        if(direction === this.constants.direction.up){
+            nav_area.x = 0;
+            nav_area.y = 0;
+            nav_area.width = dw;
+            nav_area.height = current_rect.y;
+        }else if(direction === this.constants.direction.down){
+            nav_area.x = 0;
+            nav_area.y = current_rect.bottom;
+            nav_area.width = dw;
+            nav_area.height = dh - current_rect.bottom;
+        }else if(direction === this.constants.direction.left){
+            nav_area.x = 0;
+            nav_area.y = 0;
+            nav_area.width = current_rect.x;
+            nav_area.height = dh;
+        }else if(direction === this.constants.direction.right){
+            nav_area.x = current_rect.right;
+            nav_area.y = 0;
+            nav_area.width = dw - current_rect.right;
+            nav_area.height = dh;
+        }
     }
 
     //Convert arrow key keycode to direction in string format
