@@ -1,6 +1,4 @@
-/* ---Options schema---
-    mode: string | "auto", "manual", "mixed"
-*/
+
 
 
 
@@ -30,9 +28,15 @@ class NavKeys {
         }
     }
 
+    /* ---Options schema---
+        mode: string | "auto", "manual", "mixed"
+        autoElements: array of querySelectors
+        focusOutline: css border property
+    */
     default_options = {
         mode: this.constants.mode.auto,
-        autoElements: ["a", "button", "p"]
+        autoElements: ["a", "button", "p"],
+        focusBorder: "2px solid green"
     }
 
     //---Constructor---//
@@ -74,6 +78,13 @@ class NavKeys {
                     this.navigate(direction);
             }
         })
+    }
+
+    //Generates css styles
+    generateCSS(){
+        const style=`<style>
+
+        </style>`;
     }
 
     //Navigate to another element
