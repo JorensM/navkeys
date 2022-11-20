@@ -70,7 +70,7 @@ class NavKeys {
                 event.keyCode === this.constants.key_code.right ||
                 event.keyCode === this.constants.key_code.left ){
                     const direction = this.keycodeToDirection(event.keyCode);
-                    console.log("Arrow key pressed: " + direction);
+                    //console.log("Arrow key pressed: " + direction);
                     this.navigate(direction);
             }
         })
@@ -82,19 +82,24 @@ class NavKeys {
 
         if(this.current_element === null){
             this.current_element = this.getTompostElement(this.nav_elements);
+            this.focus(this.current_element);
+            return;
         }
-        console.log(this.current_element);
+        //console.log(this.current_element);
+        this.current_element = document.activeElement;
 
         /*The area in which the navigation will occur
             (if direction = up, then above the current element, 
             if direction = right, then to the right of current element, etc.)
         */
-        const nav_area = {};
+        let nav_area = {};
         //Viewport width and height
         const vw = document.documentElement.clientWidth;
         const vh = document.documentElement.clientHeight;
         //Current elements bounding box
         const current_rect = this.current_element.getBoundingClientRect();
+
+        let target_elements = [];
 
         //Set nav_area
         if(direction === this.constants.direction.up){
@@ -119,8 +124,41 @@ class NavKeys {
             nav_area.height = vh;
         }
 
-        console.log(nav_area);
+        target_elements = this.getElementsInsideArea(this.nav_elements, nav_area);
+        //console.log("Target elements: ");
+        //console.log(target_elements);
+        //this.draw_nav_area(nav_area);
+
+        const navigate_to = this.getClosestElementCenter(this.current_element, target_elements);
+
+        this.focus(navigate_to);
+
+        //console.log(nav_area);
     }
+
+    //Focus element
+    //element - HTMLelement to focus
+    focus(element){
+        element.focus();
+        this.current_element = element;
+    }
+
+    draw_nav_area(area){
+        if(this.nav_area_element !== null){
+            this.nav_area_element.remove();
+        }
+        
+        this.nav_area_element = document.createElement("div");
+        this.nav_area_element.style.position = "absolute";
+        this.nav_area_element.style.top = area.y + "px";
+        this.nav_area_element.style.left = area.x + "px";
+        this.nav_area_element.style.width = area.width + "px";
+        this.nav_area_element.style.height = area.height + "px";
+        this.nav_area_element.style.zIndex = "999";
+        this.nav_area_element.style.border = "2px solid red";
+        document.body.appendChild(this.nav_area_element);
+    }
+    nav_area_element = null;
 
     //Remove duplicates in an array
     arr_remove_duplicates(arr){
@@ -144,8 +182,8 @@ class NavKeys {
 
     //Get highest nav_element from an array of elements
     getTompostElement(elements){
-        console.log("elements");
-        console.log(elements);
+        //console.log("elements");
+        //console.log(elements);
         if(elements.length < 1){
             throw new Error("Nav elements count = 0");
         }
@@ -172,22 +210,67 @@ class NavKeys {
         return leftmost_element;
     }
 
-    getElementsInArea(elements, area){
+    //Get elements that are contained inside an area
+    //elements - HTML elements
+    //area - {x, y, width, height}
+    //Returns array of filtered elements
+    getElementsInsideArea(elements, area){
         let output = [];
         elements.forEach(element => {
             const rect = element.getBoundingClientRect();
-            
+            if( 
+                rect.left >= area.x && 
+                rect.right <= (area.x + area.width) &&
+                rect.top >= area.y &&
+                rect.bottom <= area.y + area.height
+            ){
+                output.push(element);
+            }
         })
+        return output;
     }
 
-    overlaps(a, b) {
-        // no horizontal overlap
-        if (a.x1 >= b.x2 || b.x1 >= a.x2) return false;
-    
-        // no vertical overlap
-        if (a.y1 >= b.y2 || b.y1 >= a.y2) return false;
-    
-        return true;
+    //Get center position of element's client rect
+    //Returns {x, y}
+    getElementCenterPosition(element){
+        const rect = element.getBoundingClientRect();
+        const x = rect.x + (rect.width / 2);
+        const y = rect.y + (rect.height / 2);
+
+        return {x, y};
+    }
+
+    //Get distance between two points
+    //a, b - {x, y}
+    distanceBetweenPoints(a, b){
+        let distance = Math.hypot(b.x - a.x, b.y - a.y);
+        return distance;
+    }
+
+
+    //Calculate distance between two elements based on their center positions
+    //a, b - HTMLelement
+    distanceBetweenElementsCenter(a, b){
+        const a_center = this.getElementCenterPosition(a);
+        const b_center = this.getElementCenterPosition(b);
+
+        return this.distanceBetweenPoints(a_center, b_center);
+    }
+
+    //Get closest of a number of elements to a single target element. Calculating from element's center position
+    //from_element - HTML element from which to calculate
+    //to_elements - array of HTML element to which to compare
+    getClosestElementCenter(from_element, to_elements){
+        let closest = to_elements[0];
+        let closest_distance = this.distanceBetweenElementsCenter(from_element, to_elements[0]);
+        to_elements.forEach(to_element => {
+            const compare_distance = this.distanceBetweenElementsCenter(from_element, to_element);
+            if(compare_distance < closest_distance){
+                closest_distance = compare_distance;
+                closest = to_element;
+            }
+        })
+        return closest;
     }
 
     //Get leftmost + topmost element from an array of elements
