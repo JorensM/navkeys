@@ -82,6 +82,7 @@ var NavKeys = (function () {
                     });
                     //Remove duplicates
                     this.nav_elements = this.arr_remove_duplicates(this.nav_elements);
+                    this.setTabIndex(this.nav_elements);
                 }
             }//Add nav_elements for manual mode
             else if(options.mode === this.constants.mode.manual);
@@ -103,6 +104,14 @@ var NavKeys = (function () {
 
         //Generates css styles
         generateCSS(){
+        }
+
+        //Set tab index attribute for elements.
+        //Necessary to make elements such as 'p' focusable
+        setTabIndex(elements){
+            elements.forEach(element => {
+                element.setAttribute("tabindex", "4");
+            });
         }
 
         //Navigate to another element
@@ -137,7 +146,7 @@ var NavKeys = (function () {
                 this.focus(navigate_to);
             }
 
-            //console.log(target_elements);
+            console.log(target_elements);
 
             
 
