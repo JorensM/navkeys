@@ -34,3 +34,11 @@ If you wish to compile navkeys.js for browser manually, run the `compile_for_bro
 
 ### Styling
 Styling focused element is very simple, because the library adds tabindex attribute to all the nav elements, so you can use the `:focus` selector to apply focus styles. For example, to apply focus style to all `<p>` elements, use this selector in your CSS - `p:focus { }`.
+For example: 
+```
+p:focus{
+  background-color: gray;
+}
+```
+
+This will make your `<p>` elements have a gray background when they are focused.
