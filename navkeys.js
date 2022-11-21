@@ -1,6 +1,6 @@
 
 
-
+let navkeys_instance = null;
 
 
 //---Base class---//
@@ -43,8 +43,16 @@ class NavKeys {
         if(typeof window !== "undefined"){
             return true;
         }
-        return false;
-        
+        return false;   
+    }
+
+    //Checks if there is already an instance of NavKeys and throws error if there already is one
+    allow_single_instance(){
+        if(navkeys_instance === null){
+            navkeys_instance = this;
+        }else{
+            throw new Error("Only one instance of NavKeys is allowed!");
+        }
     }
 
     //---Constructor---//
@@ -52,6 +60,8 @@ class NavKeys {
         if(!this.is_browser()){
             console.log("NavKeys is intended for browsers, not servers!")
         }
+
+        this.allow_single_instance();
 
         options = {...this.default_options, ...options}
 
