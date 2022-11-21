@@ -31,3 +31,6 @@ If you wish to compile navkeys.js for browser manually, run the `compile_for_bro
 ### Manual mode
 
 ### Mixed mode
+
+### Styling
+
