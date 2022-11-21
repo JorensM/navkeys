@@ -36,7 +36,7 @@ var NavKeys = (function () {
         default_options = {
             mode: this.constants.mode.auto,
             autoElements: ["a", "button", "p"],
-            focusBorder: "2px solid green"
+            //focusOutline: "2px solid green"
         }
 
         //Check if script is running in browser or server
@@ -130,11 +130,16 @@ var NavKeys = (function () {
             
             
 
-            target_elements = this.getElementsInsideArea(this.nav_elements, nav_area);
+            const target_elements = this.getElementsInsideArea(this.nav_elements, nav_area);
+            if(target_elements.length > 0){
+                const navigate_to = this.getClosestElementCenter(this.current_element, target_elements);
 
-            const navigate_to = this.getClosestElementCenter(this.current_element, target_elements);
+                this.focus(navigate_to);
+            }
 
-            this.focus(navigate_to);
+            //console.log(target_elements);
+
+            
 
             //console.log(nav_area);
         }
@@ -175,12 +180,18 @@ var NavKeys = (function () {
         //direction - "up", "down", "left", "right"
         calculateNavArea(element, direction){
 
+            //console.log("calculating nav area: ");
+            //console.log(element);
+            //console.log(direction);
+            
             //Element's bounding box
             const current_rect = element.getBoundingClientRect();
 
             //Document width and height
             const dw = document.documentElement.clientWidth;
             const dh = document.documentElement.clientHeight;
+
+            let nav_area = {};
 
             if(direction === this.constants.direction.up){
                 nav_area.x = 0;
@@ -203,6 +214,8 @@ var NavKeys = (function () {
                 nav_area.width = dw - current_rect.right;
                 nav_area.height = dh;
             }
+
+            return nav_area;
         }
 
         //Convert arrow key keycode to direction in string format
