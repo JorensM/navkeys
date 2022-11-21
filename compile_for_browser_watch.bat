@@ -1,0 +1,1 @@
+rollup navkeys.js --file dist/bundle.js --format iife --name NavKeys --watch

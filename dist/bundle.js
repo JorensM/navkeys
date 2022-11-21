@@ -36,8 +36,21 @@ var NavKeys = (function () {
             focusBorder: "2px solid green"
         }
 
+        //Check if script is running in browser or server
+        is_browser(){
+            if(typeof window !== "undefined"){
+                return true;
+            }
+            return false;
+            
+        }
+
         //---Constructor---//
         constructor(options = null){
+            if(!this.is_browser()){
+                console.log("NavKeys is intended for browsers, not servers!");
+            }
+
             options = {...this.default_options, ...options};
 
             //Add nav_elements for auto/mixed modes
