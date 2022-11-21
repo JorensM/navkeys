@@ -6,7 +6,6 @@
 //---Base class---//
 class NavKeys {
 
-
     //---Constants---//
     constants = {
         mode: {
@@ -305,3 +304,5 @@ class NavKeys {
     //Currently focused element
     current_element = null;
 }
+
+export default NavKeys;
