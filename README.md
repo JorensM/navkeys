@@ -15,6 +15,14 @@ If you wish to compile navkeys.js for browser manually, run the `compile_for_bro
 ## Usage
 
 ### Basic usage
+```
+ window.onload = () {
+   const options = {
+     mode: "auto"
+   }
+   const navKeys = new NavKeys(options);
+ }
+```
 
 ### Options
 
