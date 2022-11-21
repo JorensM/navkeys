@@ -31,12 +31,10 @@ var NavKeys = (function () {
         /* ---Options schema---
             mode: string | "auto", "manual", "mixed"
             autoElements: array of querySelectors
-            focusOutline: css border property
         */
         default_options = {
             mode: this.constants.mode.auto,
             autoElements: ["a", "button", "p"],
-            //focusOutline: "2px solid green"
         }
 
         //Check if script is running in browser or server
@@ -45,6 +43,33 @@ var NavKeys = (function () {
                 return true;
             }
             return false;   
+        }
+
+
+        
+
+        //Check if specified css selector is valid
+        isSelectorValid(selector){
+            if(typeof selector !== "string"){
+                this.error("Parameter must be of type string!");
+            }
+            try{
+                this.queryCheck(selector);
+            }catch{
+                return false;
+            }
+            return true;
+        }
+        queryCheck(selector){
+            return document.createDocumentFragment().querySelector(selector);
+        }
+
+        //Throws formatted error
+        error(string){
+            if(typeof string !== "string"){
+                throw new Error("Parameter must be of type string!");
+            }
+            throw new Error("NavKeys: " + string);
         }
 
         //Checks if there is already an instance of NavKeys and throws error if there already is one
@@ -56,6 +81,43 @@ var NavKeys = (function () {
             }
         }
 
+        //Validates options object
+        validate_options(options){
+            //Mode validation
+            if(typeof options.mode !== "string"){
+                this.error("'mode' option must be of type string!");
+            }
+            if(!["auto", "manual", "mixed"].includes(options.mode)){
+                this.error("'mode' options accepts the following values: 'auto', 'manual', 'mixed'");
+            }
+            //If mode is auto, following properties must be specified
+            if(options.mode === this.constants.mode.auto){
+                if(!options.autoElements){
+                    this.error("When using 'auto' mode, autoElements option must be defined!");
+                }
+                if(!Array.isArray(options.autoElements)){
+                    this.error("'autoElements' option must be an array of strings!");
+                }
+                //Check if all autoElements entries are of type string
+                let all_string = true;
+                let all_valid = true;
+                options.autoElements.forEach(option => {
+                    if(typeof option !== "string"){
+                        all_string = false;
+                    }
+                    if(!this.isSelectorValid(option)){
+                        all_valid = false;
+                    }
+                });
+                if(!all_string){
+                    this.error("'autoElements' array's elements must be of type string");
+                }
+                if(!all_valid){
+                    this.error("'autoElements' array's elements must be valid CSS selectors!");
+                }
+            }
+        }
+
         //---Constructor---//
         constructor(options = null){
             if(!this.is_browser()){
@@ -64,7 +126,14 @@ var NavKeys = (function () {
 
             this.allow_single_instance();
 
+            //Check options type
+            if(typeof options !== "object" || options === null){
+                this.error("Options parameter must be of type object or null!");
+            }
+
             options = {...this.default_options, ...options};
+
+            this.validate_options(options);
 
             //Add nav_elements for auto/mixed modes
             if(options.mode === this.constants.mode.auto || options.mode === this.constants.mode.mixed){
@@ -102,21 +171,51 @@ var NavKeys = (function () {
             });
         }
 
-        //Generates css styles
-        generateCSS(){
-        }
 
         //Set tab index attribute for elements.
         //Necessary to make elements such as 'p' focusable
         setTabIndex(elements){
+            console.log(elements);
+            if(!Array.isArray(elements)){
+                this.error("Parameter must be an array!");
+            }
+            if(!this.areDomEntities(elements)){
+                this.error("Array must only contain DOM elements!");
+            }
             elements.forEach(element => {
                 element.setAttribute("tabindex", "4");
             });
         }
 
+        //Check if entity is a DOM element
+        isDomEntity(entity) {
+            if(typeof entity  === 'object' && entity.nodeType !== undefined){
+               return true;
+            }
+            else {
+               return false;
+            }
+        }
+
+        //Check if array contains only DOM elements
+        areDomEntities(array){
+            if(!Array.isArray(array)){
+                this.error("Parameter must be an array!");
+            }
+            let all_entities = true;
+            array.forEach(entity => {
+                if(!this.isDomEntity(entity)){
+                    all_entities = false;
+                }
+            });
+            return all_entities;
+        }
+
         //Navigate to another element
         //Direction = "up", "down", "left", "right"
         navigate(direction){
+
+            this.validateDirection(direction);
 
             if(this.current_element === null){
                 this.current_element = this.getTompostElement(this.nav_elements);
@@ -153,9 +252,66 @@ var NavKeys = (function () {
             //console.log(nav_area);
         }
 
+        //Validates direction
+        validateDirection(direction){
+            this.validateType(direction, "string");
+            if(!["up", "down", "left", "right"].includes(direction)){
+                this.error("Direction parameter must be one of the following - 'up', 'down', 'left', 'right'");
+            }
+        }
+
+        //Validates whether the specified variable is of given type
+        //target - target variable
+        //type - type to check against
+        validateType(target, type){
+            if(typeof target !== type || target === null){
+                this.error("Parameter must be of type " + type + "!");
+            }
+        }
+
+        //Validates whether specified variable is a DOM entity and throws error if false
+        validateDomEntity(entity){
+            if(!this.isDomEntity(entity)){
+                this.error("Parameter must be a DOM element!");
+            }
+        }
+
+        //Validates whether specified array only contains DOM entities
+        validateDomEntities(arr){
+            if(!this.areDomEntities(arr)){
+                this.error("Parameter must be an array containing only DOM elements!");
+            }
+        }
+
+        //Validates whether specified variable is a valid area (is object and has following properties: x, y, height, width)
+        validateArea(area){
+            this.validateType(area, "object");
+            this.validateType(area.x, "number");
+            this.validateType(area.y, "number");
+            this.validateType(area.width, "number");
+            this.validateType(area.height, "number");
+        }
+
+        //Validates whether specified variable is array and throws error if false
+        validateArray(arr){
+            if(!Array.isArray(arr)){
+                this.error("Parameter must be an array!");
+            }
+        }
+
+        //Validates whether specified variable is an object with properties x, y
+        validatePoint(target){
+            this.validateType(target, "object");
+            this.validateType(target.x, "number");
+            this.validateType(target.y, "number");
+        }
+
         //Focus element
         //element - HTMLelement to focus
         focus(element){
+            //Validation
+            this.validateDomEntity(element);
+
             element.focus();
             this.current_element = element;
         }
@@ -180,6 +336,9 @@ var NavKeys = (function () {
 
         //Remove duplicates in an array
         arr_remove_duplicates(arr){
+            //Validation
+            this.validateArray(arr);
+
             const uniq = [...new Set(arr)];
             return uniq;
         }
@@ -192,6 +351,9 @@ var NavKeys = (function () {
             //console.log("calculating nav area: ");
             //console.log(element);
             //console.log(direction);
+
+            this.validateDomEntity(element);
+            this.validateDirection(direction);
             
             //Element's bounding box
             const current_rect = element.getBoundingClientRect();
@@ -229,6 +391,7 @@ var NavKeys = (function () {
 
         //Convert arrow key keycode to direction in string format
         keycodeToDirection(keycode){
+            this.validateType(keycode, "number");
             switch(keycode){
                 case this.constants.key_code.up:
                     return this.constants.direction.up;
@@ -243,6 +406,8 @@ var NavKeys = (function () {
 
         //Get highest nav_element from an array of elements
         getTompostElement(elements){
+
+            this.validateDomEntities(elements);
             //console.log("elements");
             //console.log(elements);
             if(elements.length < 1){
@@ -259,6 +424,9 @@ var NavKeys = (function () {
 
         //Get leftmost nav_element from an array of elements
         getLeftmostElement(elements){
+
+            this.validateDomEntities(elements);
+
             if(elements.length < 1){
                 throw new Error("Nav elements count = 0");
             }
@@ -276,6 +444,11 @@ var NavKeys = (function () {
         //area - {x, y, width, height}
         //Returns array of filtered elements
         getElementsInsideArea(elements, area){
+
+            //Validation
+            this.validateDomEntities(elements);
+            this.validateArea(area);
+
             let output = [];
             elements.forEach(element => {
                 const rect = element.getBoundingClientRect();
@@ -294,6 +467,10 @@ var NavKeys = (function () {
         //Get center position of element's client rect
         //Returns {x, y}
         getElementCenterPosition(element){
+
+            //Validation
+            this.validateDomEntity(element);
+
             const rect = element.getBoundingClientRect();
             const x = rect.x + (rect.width / 2);
             const y = rect.y + (rect.height / 2);
@@ -304,6 +481,11 @@ var NavKeys = (function () {
         //Get distance between two points
         //a, b - {x, y}
         distanceBetweenPoints(a, b){
+
+            //Validation
+            this.validatePoint(a);
+            this.validatePoint(b);
+
             let distance = Math.hypot(b.x - a.x, b.y - a.y);
             return distance;
         }
@@ -322,6 +504,11 @@ var NavKeys = (function () {
         //from_element - HTML element from which to calculate
         //to_elements - array of HTML element to which to compare
         getClosestElementCenter(from_element, to_elements){
+
+            //Validation
+            this.validateDomEntity(from_element);
+            this.validateDomEntities(to_elements);
+
             let closest = to_elements[0];
             let closest_distance = this.distanceBetweenElementsCenter(from_element, to_elements[0]);
             to_elements.forEach(to_element => {
