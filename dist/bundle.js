@@ -37,6 +37,7 @@ var NavKeys = (function () {
                 left
                 right
             }
+            useClass: whether to use classes for focus style. If true, pass string for class name, if false, pass boolean false
         */
         default_options = {
             mode: this.constants.mode.auto,
@@ -46,7 +47,8 @@ var NavKeys = (function () {
                 down: this.constants.key_code.down,
                 left: this.constants.key_code.left,
                 right: this.constants.key_code.right
-            }
+            },
+            useClass: false
         }
 
         //Check if script is running in browser or server
@@ -147,6 +149,8 @@ var NavKeys = (function () {
 
             this.validate_options(options);
 
+            this.options = options;
+
             //Add nav_elements for auto/mixed modes
             if(options.mode === this.constants.mode.auto || options.mode === this.constants.mode.mixed){
                 if(options.autoElements === undefined || options.autoElements === null || !Array.isArray(options.autoElements)){
@@ -163,7 +167,10 @@ var NavKeys = (function () {
                     });
                     //Remove duplicates
                     this.nav_elements = this.arr_remove_duplicates(this.nav_elements);
-                    this.setTabIndex(this.nav_elements);
+                    if(!options.useClass){
+                        this.setTabIndex(this.nav_elements);
+                    }
+                    
                 }
             }//Add nav_elements for manual mode
             else if(options.mode === this.constants.mode.manual);
@@ -235,7 +242,7 @@ var NavKeys = (function () {
                 return;
             }
             //console.log(this.current_element);
-            this.current_element = document.activeElement;
+            //this.current_element = document.activeElement;
 
             /*The area in which the navigation will occur
                 (if direction = up, then above the current element, 
@@ -259,7 +266,7 @@ var NavKeys = (function () {
 
             console.log(target_elements);
 
-            
+            //this.draw_nav_area(nav_area);
 
             //console.log(nav_area);
         }
@@ -324,9 +331,36 @@ var NavKeys = (function () {
             //Validation
             this.validateDomEntity(element);
 
+            //Unfocus previous element(if set)
+            if(this.current_element !== null){
+                //console.log(this.current_element);
+                this.current_element.blur();
+                
+                //Remove focus class from previous element
+                if(this.options.useClass){
+                    this.current_element.classList.remove(this.options.useClass);
+                }
+            }
+            
+
+            //Focus new element
             element.focus();
             this.current_element = element;
+            //Add focus class to new element
+            if(this.options.useClass){
+                this.current_element.classList.add(this.options.useClass);
+            }
+            //console.log("useclass: ");
+            //console.log(this.options.useClass);
         }
+
+        // //Unfocus element
+        // //element - HTMLElement to unfocus.
+        // unfocus(element){
+        //     this.validateDomEntity(element);
+
+        //     element.unfocus();
+        // }
 
         //Draw nav area, for debug
         draw_nav_area(area){
@@ -369,6 +403,7 @@ var NavKeys = (function () {
             
             //Element's bounding box
             const current_rect = element.getBoundingClientRect();
+            console.log(element);
 
             //Document width and height
             const dw = document.documentElement.clientWidth;
@@ -381,6 +416,8 @@ var NavKeys = (function () {
                 nav_area.y = 0;
                 nav_area.width = dw;
                 nav_area.height = current_rect.y;
+                console.log("h: ");
+                console.log(nav_area.height);
             }else if(direction === this.constants.direction.down){
                 nav_area.x = 0;
                 nav_area.y = current_rect.bottom;
@@ -552,6 +589,9 @@ var NavKeys = (function () {
         nav_elements = [];
         //Currently focused element
         current_element = null;
+
+        //Current options
+        options = null;
     }
 
     return NavKeys;
