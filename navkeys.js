@@ -30,10 +30,22 @@ class NavKeys {
     /* ---Options schema---
         mode: string | "auto", "manual", "mixed"
         autoElements: array of querySelectors
+        keys: { 
+            up
+            down
+            left
+            right
+        }
     */
     default_options = {
         mode: this.constants.mode.auto,
         autoElements: ["a", "button", "p"],
+        keys: {
+            up: this.constants.key_code.up,
+            down: this.constants.key_code.down,
+            left: this.constants.key_code.left,
+            right: this.constants.key_code.right
+        }
     }
 
     //Check if script is running in browser or server
@@ -219,7 +231,7 @@ class NavKeys {
         this.validateDirection(direction);
 
         if(this.current_element === null){
-            this.current_element = this.getTompostElement(this.nav_elements);
+            this.current_element = this.getTompostElements(this.nav_elements)[0];
             this.focus(this.current_element);
             return;
         }
@@ -394,19 +406,19 @@ class NavKeys {
     keycodeToDirection(keycode){
         this.validateType(keycode, "number");
         switch(keycode){
-            case this.constants.key_code.up:
+            case this.options.keys.up:
                 return this.constants.direction.up;
-            case this.constants.key_code.down:
+            case this.options.keys.down:
                 return this.constants.direction.down;
-            case this.constants.key_code.left:
+            case this.options.keys.left:
                 return this.constants.direction.left;
-            case this.constants.key_code.right:
+            case this.options.keys.right:
                 return this.constants.direction.right;
         }
     }
 
     //Get highest nav_element from an array of elements
-    getTompostElement(elements){
+    getTompostElements(elements){
 
         this.validateDomEntities(elements);
         //console.log("elements");
@@ -420,7 +432,16 @@ class NavKeys {
                 highest_element = element;
             }
         })
-        return highest_element;
+        let highest_elements = [];
+        elements.forEach(element => {
+            if(element.getBoundingClientRect().y === highest_element.getBoundingClientRect().y){
+                highest_elements.push(element);
+            }
+        })
+        //if(highest_elements.length > 1){
+            //return highest_elements;
+        //}
+        return highest_elements;
     }
 
     //Get leftmost nav_element from an array of elements
