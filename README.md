@@ -6,6 +6,15 @@
     * [NodeJs](#nodejs)
     * [CDN](#cdn)
     * [Manual browser bundling](#manual-browser-bundling)
+ * [Usage](#usage)
+    * [Basic usage](#basic-usage)
+    * [Options](#options)
+    * [Modes](#modes)
+       * [Auto mode](#auto-mode)
+       * [Manual mode](#manual-mode)
+       * [Mixed mode](#mixed-mode)
+    * [Styling](#styling)
+       * 
 
 ## Installation
 
@@ -32,11 +41,13 @@ If you wish to compile navkeys.js for browser manually, run the `compile_for_bro
 
 ### Options
 
-### Auto mode
+### Modes
 
-### Manual mode
+#### Auto mode
 
-### Mixed mode
+#### Manual mode
+
+#### Mixed mode
 
 ### Styling
 There are two ways you can style focused elements, depending on which value you passed to the `useClass` option.
