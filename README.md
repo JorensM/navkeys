@@ -3,9 +3,9 @@
  
 ## Table of Contents
  * [Installation](#installation)
-    * NodeJs
-    * CDN
-    * Manual browser bundling
+    * [NodeJs]($nodejs)
+    * [CDN](#cdn)
+    * [Manual browser bundling](#manual-browser-bundling)
 
 ## Installation
 
