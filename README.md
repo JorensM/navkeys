@@ -75,12 +75,16 @@ If this key is set, currently focused element will blur on press. Should be a nu
 #### Default options
 
 ### Modes
+There are 3 possible modes for NavKeys - Auto mode, Manual mode, and Mixed mode. Each one has their own advantages and disadvantages, and should be used depending on how your website is structured.
 
 #### Auto mode
+In this mode, navigatable elements will be determined based on the CSS selectors passed to the `autoElements` option. This mode is best suited if your website has a repetitive structure and if the navigatable elements can be easily defined with CSS selectors
 
 #### Manual mode
+In this mode, navigatable elements will be those elements that have the attribute `navkeys` set to them. This mode is best suited if your website has unique, complex elements that are difficult to define using CSS selectors.
 
 #### Mixed mode
+This mode will have both manual and auto modes enabled. This mode is best suited if your website has a mix of repetitive structure as well unique elements.
 
 ### Styling
 There are two ways you can style focused elements, depending on which value you passed to the `useClass` option.
