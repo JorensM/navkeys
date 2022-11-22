@@ -40,7 +40,7 @@ class NavKeys {
     */
     default_options = {
         mode: this.constants.mode.auto,
-        autoElements: ["a", "button", "p"],
+        autoElements: ["a", "button", "p", "li"],
         keys: {
             up: this.constants.key_code.up,
             down: this.constants.key_code.down,
@@ -203,7 +203,13 @@ class NavKeys {
             this.error("Array must only contain DOM elements!");
         }
         elements.forEach(element => {
-            element.setAttribute("tabindex", "4")
+            const current_tab_index = +element.getAttribute("tabindex");
+            console.log("tabindex:");
+            console.log(current_tab_index);
+            //Only set tab index if it hasn't already been set
+            if(current_tab_index === 0){
+                element.setAttribute("tabindex", "-1");
+            }
         })
     }
 
