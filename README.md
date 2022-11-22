@@ -2,9 +2,12 @@
  Make your website navigatable by arrow keys
  
 ## Table of Contents
+ * Installation
+  * NodeJs
+  * CDN
+  * Manual browser bundling
 
-
-## [Installation][installation]
+## Installation
 
 ### NodeJs
 To install NavKeys into a NodeJs project, run the command `npm install navkeys`
