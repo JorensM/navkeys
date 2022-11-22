@@ -9,6 +9,10 @@
  * [Usage](#usage)
     * [Basic usage](#basic-usage)
     * [Options](#options)
+       * [mode](#mode)
+       * [useClass](#useclass)
+       * [keys](#keys)
+       * [autoElements](#autoelements)
        * [Default options](#default-options) 
     * [Modes](#modes)
        * [Auto mode](#auto-mode)
@@ -53,6 +57,12 @@ This option is used to select which [mode](#modes) to run the library in. Possib
 
 ##### useClass
 This option is used to select which type of styling the library will use.If you pass `false` to it, `:focus` styling will be used. If you pass a string value, then the class with the name of that value will be applied to focused elements. See the [Styling section](#styling) for more info.
+
+##### keys
+This option lets you set custom keys for navigation. Should be an object containing the following properties - `up`, `down`, `left`, `right`. Each of the properties should be a number representing the keycode for the respective nav direction.
+
+##### autoElements
+In auto/mixed modes, specifies the selectors that will be added as navigatable elements. Should be an array of strings, each of the strings being a CSS selector.
 
 #### Default options
 
