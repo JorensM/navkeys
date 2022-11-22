@@ -43,7 +43,7 @@ var NavKeys = (function () {
         */
         default_options = {
             mode: this.constants.mode.auto,
-            autoElements: ["a", "button", "p", "li"],
+            autoElements: ["a", "button", "p", "li", "h1, h2, h3, h4, h5, h6"],
             keys: {
                 up: this.constants.key_code.up,
                 down: this.constants.key_code.down,
@@ -325,11 +325,12 @@ var NavKeys = (function () {
             const target_elements = this.getElementsInsideArea(this.nav_elements, nav_area);
             if(target_elements.length > 0){
                 const navigate_to = this.getClosestElementCenter(this.current_element, target_elements);
-
+                console.log("navigate to: ");
+                console.log(navigate_to);
                 this.focus(navigate_to);
             }
 
-            console.log(target_elements);
+            //console.log(target_elements);
 
             //this.draw_nav_area(nav_area);
 
@@ -485,7 +486,7 @@ var NavKeys = (function () {
                 console.log(nav_area.height);
             }else if(direction === this.constants.direction.down){
                 nav_area.x = 0;
-                nav_area.y = current_rect.bottom;
+                nav_area.y = current_rect.bottom - 1;
                 nav_area.width = dw;
                 nav_area.height = dh - current_rect.bottom;
             }else if(direction === this.constants.direction.left){
@@ -659,6 +660,9 @@ var NavKeys = (function () {
             let closest_distance = this.distanceBetweenElementsCenter(from_element, to_elements[0]);
             to_elements.forEach(to_element => {
                 const compare_distance = this.distanceBetweenElementsCenter(from_element, to_element);
+                console.log("to_element: ");
+                console.log(to_element);
+                console.log(compare_distance);
                 if(compare_distance < closest_distance){
                     closest_distance = compare_distance;
                     closest = to_element;

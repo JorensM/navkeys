@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <link rel="stylesheet" href="style.css">
+        <script src="../dist/bundle.js"></script>
+    </head>
+    <body>
+        <script>
+
+            const custom_keys = {
+                up: 87,
+                down: 83,
+                left: 65,
+                right: 68
+            }
+
+            const navKeysOptions = {
+                mode: "auto",
+                useClass: "navkeys-focus"
+            }
+            window.onload = () => {
+                //console.log(NavKeys);
+                const navKeys = new NavKeys(navKeysOptions);
+                //console.log(navKeys.nav_elements);
+                //const navKeys2 = new NavKeys(navKeysOptions);
+            }
+
+            function button_click(e){
+                //console.log("Clicked " + e.innerText);
+                alert("Clicked!");
+            }
+            
+        </script>
+
+        <h1>NavKeys demo page</h1>
+        <!-- <button onclick="button_click(this)">Hello!</button> -->
+        <p>Use arrow keys to navigate this page!</p>
+        <h2>Lists</h2>
+        <p>NavKeys works on lists!</p>
+        <ul>
+            <li>Item #1</li>
+            <li>Item #2</li>
+            <li>Item #3</li>
+            <ul>
+                <li>Subitem #1</li>
+                <li>Subitem #2</li>
+            </ul>
+        </ul>
+        <div class="columns">
+            <div class="col">
+                <button onclick="button_click(this)">Click me!</button>
+            </div>
+            <div class="col">
+                
+            </div>
+        </div>
+    </body>
+</html>
