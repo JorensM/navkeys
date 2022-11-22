@@ -128,4 +128,4 @@ When an element gets focused, the specified class will be applied to it.
 ## Proudly sponsored by
 *Empty...*
 
-<sup>To become a sponsor, kindly contact me at [jorensmerenjanu@gmail.com](jorensmerenjanu@gmail.com)</sup>
+<sup>To become a sponsor, kindly contact me at [jorensmerenjanu@gmail.com](mailto:jorensmerenjanu@gmail.com)</sup>
