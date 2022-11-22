@@ -55,4 +55,5 @@ For example, if you set the `useClass` value to `focused-class`, then in your CS
 ```
 When an element gets focused, the specified class will be applied to it.
 
-This will make your `<p>` elements have a gray background when they are focused.
+## Proudly sponsored by
+*Empty...*
