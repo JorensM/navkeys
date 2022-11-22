@@ -55,7 +55,7 @@ Example code:
 Optionally, an options object can be passed to the NavKeys constructor. If no options are specified, or some are omitted, then the [default options](#default-options) will be used. Below is a list of all options
 
 ##### mode
-This option is used to select which [mode](#modes) to run the library in. Possible values are - `auto`, `manual`, `mixed`
+This option is used to select which [mode](#modes) to run the library in. Possible values are - `"auto"`, `"manual"`, `"mixed"`
 
 ##### useClass
 This option is used to select which type of styling the library will use.If you pass `false` to it, `:focus` styling will be used. If you pass a string value, then the class with the name of that value will be applied to focused elements. See the [Styling section](#styling) for more info.
@@ -91,7 +91,7 @@ default_options = {
 ```
 
 ### Modes
-There are 3 possible modes for NavKeys - Auto mode, Manual mode, and Mixed mode. Each one has their own advantages and disadvantages, and should be used depending on how your website is structured.
+There are 3 possible modes for NavKeys - *Auto* mode, *Manual* mode, and *Mixed* mode. Each one has their own advantages and disadvantages, and should be used depending on how your website is structured.
 
 #### Auto mode
 In this mode, navigatable elements will be determined based on the CSS selectors passed to the `autoElements` option. This mode is best suited if your website has a repetitive structure and if the navigatable elements can be easily defined with CSS selectors
@@ -117,7 +117,7 @@ This will make your `<p>` elements have a gray background when they are focused.
 
 #### useClass Styling
 If you specified a string value to the `useClass` option, then you can create a CSS class that is the value of the `useClass` option, and styles from this class will apply to the focused elements.
-For example, if you set the `useClass` value to `focused-class`, then in your CSS you can add the following code:
+For example, if you set the `useClass` value to `"focused-class"`, then in your CSS you can add the following code:
 ```
 .focused-class{
   background-color: gray;
