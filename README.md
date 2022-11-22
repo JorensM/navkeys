@@ -3,7 +3,7 @@
  
 ## Table of Contents
  * [Installation](#installation)
-    * [NodeJs]($nodejs)
+    * [NodeJs](#nodejs)
     * [CDN](#cdn)
     * [Manual browser bundling](#manual-browser-bundling)
 
