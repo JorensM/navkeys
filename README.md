@@ -17,7 +17,6 @@
     * [Styling](#styling)
        * [:focus Styling](#focus-styling)
        * [useClass Styling](#useclass-styling)
- * [API](#api)
  * [Proudly sponsored by](#proudly-sponsored-by)
 
 ## Installation
@@ -80,8 +79,6 @@ For example, if you set the `useClass` value to `focused-class`, then in your CS
 }
 ```
 When an element gets focused, the specified class will be applied to it.
-
-//## API
 
 ## Proudly sponsored by
 *Empty...*
