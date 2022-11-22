@@ -4,7 +4,7 @@
 ## Table of Contents
 
 
-## [Installation](#installation)
+## [Installation][installation]
 
 ### NodeJs
 To install NavKeys into a NodeJs project, run the command `npm install navkeys`
