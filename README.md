@@ -100,7 +100,7 @@ In this mode, navigatable elements will be determined based on the CSS selectors
 In this mode, navigatable elements will be those elements that have the attribute `navkeys` set to them. This mode is best suited if your website has unique, complex elements that are difficult to define using CSS selectors.
 
 #### Mixed mode
-This mode will have both manual and auto modes enabled. This mode is best suited if your website has a mix of repetitive structure as well unique elements.
+This mode will have both manual and auto modes enabled. This mode is best suited if your website has a mix of repetitive structure as well as unique elements.
 
 ### Styling
 There are two ways you can style focused elements, depending on which value you passed to the `useClass` option.
