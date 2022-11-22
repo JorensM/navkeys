@@ -2,7 +2,7 @@
  Make your website navigatable by arrow keys
  
 ## Table of Contents
- * Installation
+ * [Installation](#installation)
     * NodeJs
     * CDN
     * Manual browser bundling
