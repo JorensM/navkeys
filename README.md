@@ -38,7 +38,6 @@ To use this library, simply create a new instance of the NavKeys class, and pass
 Example code:
 ```
  window.onload = () {
- 
    const options = {
      mode: "auto"
    }
