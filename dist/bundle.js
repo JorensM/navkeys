@@ -38,6 +38,8 @@ var NavKeys = (function () {
                 right
             }
             useClass: whether to use classes for focus style. If true, pass string for class name, if false, pass boolean false
+            comboKey: if comboKey is set, navigation will only work when this key is down. False to disable
+            unfocusKey: keycode for the key that will unfocus the focused element. False to disable
         */
         default_options = {
             mode: this.constants.mode.auto,
@@ -48,7 +50,9 @@ var NavKeys = (function () {
                 left: this.constants.key_code.left,
                 right: this.constants.key_code.right
             },
-            useClass: false
+            useClass: false,
+            comboKey: false,
+            unfocusKey: false
         }
 
         //Check if script is running in browser or server
@@ -113,6 +117,9 @@ var NavKeys = (function () {
                 typeof options.keys.right !== "number"){
                     this.error("'keys' options's properties must be of type number");
             }
+            if(typeof options.useClass !== "boolean" && typeof options.useClass !== "string"){
+                this.error("'useClass' option must be of type boolean or string!");
+            }
             //If mode is auto, following properties must be specified
             if(options.mode === this.constants.mode.auto){
                 if(!options.autoElements){
@@ -160,6 +167,12 @@ var NavKeys = (function () {
 
             this.options = options;
 
+            if(options.comboKey){
+                this.is_combo_key_down = false;
+            }else {
+                this.is_combo_key_down = true;
+            }
+
             //Add nav_elements for auto/mixed modes
             if(options.mode === this.constants.mode.auto || options.mode === this.constants.mode.mixed){
                 if(options.autoElements === undefined || options.autoElements === null || !Array.isArray(options.autoElements)){
@@ -188,15 +201,49 @@ var NavKeys = (function () {
             }
 
             window.addEventListener("keydown", event => {
-                if( event.keyCode === this.options.keys.up ||
+                //Prevent scrolling if up/down arrow keys are being used
+                if((event.keyCode === this.constants.key_code.up && this.isKeySet(this.constants.key_code.up)) ||
+                    event.keyCode === this.constants.key_code.down && this.isKeySet(this.constants.key_code.down)){
+                        event.preventDefault();
+                }
+                //console.log(this.is_combo_key_down);
+                if( (event.keyCode === this.options.keys.up ||
                     event.keyCode === this.options.keys.down ||
                     event.keyCode === this.options.keys.right ||
-                    event.keyCode === this.options.keys.left ){
+                    event.keyCode === this.options.keys.left) && this.is_combo_key_down ){
                         const direction = this.keycodeToDirection(event.keyCode);
                         //console.log("Arrow key pressed: " + direction);
                         this.navigate(direction);
                 }
+                //Check if combo key is down, and set the according variable
+                if(this.options.comboKey && event.keyCode === this.options.comboKey){
+                    this.is_combo_key_down = true;
+                }
+
+                //Unfocus key down, blur element and set current_element to null
+                if(this.options.unfocusKey && event.keyCode === this.options.unfocusKey && this.current_element !== null){
+                    this.current_element.blur();
+                    if(this.options.useClass){
+                        this.current_element.classList.remove(this.options.useClass);
+                    }
+                    this.current_element = null;
+                }
             });
+
+            window.addEventListener("keyup", event => {
+                //Check if combo key is released, and set the according variable
+                if(this.options.comboKey && event.keyCode === this.options.comboKey){
+                    this.is_combo_key_down = false;
+                }
+            });
+        }
+
+        //Check if given keycode is used as a key in options
+        isKeySet(keycode){
+
+            const keys = this.options.keys;
+
+            return [keys.up, keys.down, keys.left, keys.right].includes(keycode);
         }
 
 
@@ -252,7 +299,10 @@ var NavKeys = (function () {
             this.validateDirection(direction);
 
             if(this.current_element === null){
-                this.current_element = this.getTompostElements(this.nav_elements)[0];
+               // this.current_element = this.getTompostElements(this.nav_elements)[0];
+                this.current_element = this.getFirstElement(this.nav_elements);
+                console.log("first element: ");
+                console.log(this.current_element);
                 this.focus(this.current_element);
                 return;
             }
@@ -470,7 +520,7 @@ var NavKeys = (function () {
         }
 
         //Get highest nav_element from an array of elements
-        getTompostElements(elements){
+        getTopmostElements(elements){
 
             this.validateDomEntities(elements);
             //console.log("elements");
@@ -497,20 +547,42 @@ var NavKeys = (function () {
         }
 
         //Get leftmost nav_element from an array of elements
-        getLeftmostElement(elements){
+        getLeftmostElements(elements){
 
             this.validateDomEntities(elements);
 
             if(elements.length < 1){
                 throw new Error("Nav elements count = 0");
             }
-            leftmost_element = elements[0];
-            this.elements.forEach(element => {
-                if(element.getBoundingClientRect().x < highest_element.getBoundingClientRect().x){
+            let leftmost_element = elements[0];
+            console.log("elems: ");
+            console.log(elements);
+            elements.forEach(element => {
+                if(element.getBoundingClientRect().x < leftmost_element.getBoundingClientRect().x){
                     leftmost_element = element;
                 }
             });
-            return leftmost_element;
+
+            let leftmost_elements = [];
+            elements.forEach(element => {
+                if(element.getBoundingClientRect().x === leftmost_element.getBoundingClientRect().x){
+                    leftmost_elements.push(element);
+                }
+            });
+            return leftmost_elements;
+        }
+
+        //Get leftmost + topmost element from an array of elements
+        getFirstElement(elements){
+            elements = this.getTopmostElements(elements);
+            this.getTom;
+            console.log("topmost: ");
+            console.log(elements);
+           
+            elements = this.getLeftmostElements(elements);
+            console.log("leftmost: ");
+            console.log(elements);
+            return elements[0];
         }
 
         //Get elements that are contained inside an area
@@ -595,11 +667,7 @@ var NavKeys = (function () {
             return closest;
         }
 
-        //Get leftmost + topmost element from an array of elements
-        // getFirstElement(elements){
-        //     elements = this.getTompostElement(elements);
-        //     elements = this.getL
-        // }
+        
 
         //Elements that are navigatable
         nav_elements = [];
@@ -608,6 +676,9 @@ var NavKeys = (function () {
 
         //Current options
         options = null;
+
+        //Whether the combo key is currently held down
+        is_combo_key_down = true;
     }
 
     return NavKeys;
