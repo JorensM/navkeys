@@ -33,7 +33,7 @@ If you wish to compile navkeys.js for browser manually, run the `compile_for_bro
 ## Usage
 
 ### Basic usage
-To use this library, simply create a new instance of the NavKeys class, and pass options to it. If there are no options passed, or some options are omitted, then [default options](#default-options) will be used. *It is important that you create the instance after the DOM has been loaded*, otherwise the library won't be able to map the elements.
+To use this library, simply create a new instance of the NavKeys class, and optionally(pun intended) pass options to it. *It is important that you create the instance after the DOM has been loaded*, otherwise the library won't be able to map the navigatable elements.
 Example code:
 ```
  window.onload = () {
@@ -46,6 +46,13 @@ Example code:
 ```
 
 ### Options
+Optionally, an options object can be passed to the NavKeys constructor. If no options are specified, or some are omitted, then the [default options](#default-options) will be used.Below is a list of all options
+
+##### mode
+This option is used to select which [mode](#modes) to run the library in. Possible values are - `auto`, `manual`, `mixed`
+
+##### useClass
+This option is used to select which type of styling the library will use.If you pass `false` to it, `:focus` styling will be used. If you pass a string value, then the class with the name of that value will be applied to focused elements. See the [Styling section](#styling) for more info.
 
 #### Default options
 
