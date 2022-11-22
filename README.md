@@ -103,7 +103,7 @@ In this mode, navigatable elements will be those elements that have the attribut
 This mode will have both manual and auto modes enabled. This mode is best suited if your website has a mix of repetitive structure as well as unique elements.
 
 ### Styling
-There are two ways you can style focused elements, depending on which value you passed to the `useClass` option.
+There are two ways you can style focused elements, depending on which value the `useClass` option is set to.
 
 #### :focus Styling
 If you set `useClass` option to `false`, then styling elements can be done by applying the `:focus` selector to target CSS classes.
