@@ -13,6 +13,8 @@
        * [useClass](#useclass)
        * [keys](#keys)
        * [autoElements](#autoelements)
+       * [comboKey](#combokey)
+       * [unfocusKey](#unfocuskey)
        * [Default options](#default-options) 
     * [Modes](#modes)
        * [Auto mode](#auto-mode)
@@ -50,7 +52,7 @@ Example code:
 ```
 
 ### Options
-Optionally, an options object can be passed to the NavKeys constructor. If no options are specified, or some are omitted, then the [default options](#default-options) will be used.Below is a list of all options
+Optionally, an options object can be passed to the NavKeys constructor. If no options are specified, or some are omitted, then the [default options](#default-options) will be used. Below is a list of all options
 
 ##### mode
 This option is used to select which [mode](#modes) to run the library in. Possible values are - `auto`, `manual`, `mixed`
@@ -63,6 +65,12 @@ This option lets you set custom keys for navigation. Should be an object contain
 
 ##### autoElements
 In auto/mixed modes, specifies the selectors that will be added as navigatable elements. Should be an array of strings, each of the strings being a CSS selector.
+
+##### comboKey
+If this key is set, navigation will only work when it is held down. Should be a number representing a keycode. Set to `false` to disable.
+
+##### unfocusKey
+If this key is set, currently focused element will blur on press. Should be a number representing a keycode. Set to `false` to disable
 
 #### Default options
 
