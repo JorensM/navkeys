@@ -81,7 +81,7 @@ For example, if you set the `useClass` value to `focused-class`, then in your CS
 ```
 When an element gets focused, the specified class will be applied to it.
 
-## API
+//## API
 
 ## Proudly sponsored by
 *Empty...*
