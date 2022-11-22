@@ -73,6 +73,22 @@ If this key is set, navigation will only work when it is held down. Should be a 
 If this key is set, currently focused element will blur on press. Should be a number representing a keycode. Set to `false` to disable
 
 #### Default options
+These are the default options. If an option is not specified when creating a NavKeys instance, default option will be used.
+```
+default_options = {
+        mode: this.constants.mode.auto,
+        autoElements: ["a", "button", "p", "li"],
+        keys: {
+            up: 38,
+            down: 40,
+            left: 37,
+            right: 39
+        },
+        useClass: false,
+        comboKey: false,
+        unfocusKey: false
+    }
+```
 
 ### Modes
 There are 3 possible modes for NavKeys - Auto mode, Manual mode, and Mixed mode. Each one has their own advantages and disadvantages, and should be used depending on how your website is structured.
