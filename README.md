@@ -39,7 +39,7 @@ If you wish to compile navkeys.js for browser manually, run the `compile_for_bro
 ## Usage
 
 ### Basic usage
-To use this library, simply create a new instance of the NavKeys class, and optionally(pun intended) pass options to it. *It is important that you create the instance after the DOM has been loaded*, otherwise the library won't be able to map the navigatable elements.
+To use this library, simply create a new instance of the NavKeys class, and optionally(pun intended) pass options to it. **It is important that you create the instance after the DOM has been loaded**, otherwise the library won't be able to map the navigatable elements.
 Example code:
 ```
  window.onload = () {
@@ -91,7 +91,7 @@ default_options = {
 ```
 
 ### Modes
-There are 3 possible modes for NavKeys - *Auto* mode, *Manual* mode, and *Mixed* mode. Each one has their own advantages and disadvantages, and should be used depending on how your website is structured.
+There are 3 possible modes for NavKeys - **Auto** mode, **Manual** mode, and **Mixed** mode. Each one has their own advantages and disadvantages, and should be used depending on how your website is structured.
 
 #### Auto mode
 In this mode, navigatable elements will be determined based on the CSS selectors passed to the `autoElements` option. This mode is best suited if your website has a repetitive structure and if the navigatable elements can be easily defined with CSS selectors
@@ -127,3 +127,4 @@ When an element gets focused, the specified class will be applied to it.
 
 ## Proudly sponsored by
 *Empty...*
+To become a sponsor, kindly contact me at [jorensmerenjanu@gmail.com](jorensmerenjanu@gmail.com)
