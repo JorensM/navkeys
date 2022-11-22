@@ -9,6 +9,7 @@
  * [Usage](#usage)
     * [Basic usage](#basic-usage)
     * [Options](#options)
+       * [Default options](#default-options) 
     * [Modes](#modes)
        * [Auto mode](#auto-mode)
        * [Manual mode](#manual-mode)
@@ -16,6 +17,7 @@
     * [Styling](#styling)
        * [:focus Styling](#focus-styling)
        * [useClass Styling](#useclass-styling)
+ * [API](#api)
  * [Proudly sponsored by](#proudly-sponsored-by)
 
 ## Installation
@@ -32,6 +34,7 @@ If you wish to compile navkeys.js for browser manually, run the `compile_for_bro
 ## Usage
 
 ### Basic usage
+To use this library, simply create a new instance of the NavKeys class, and pass options to it. If there are no options passed, or some options are omitted, then [default options](#default-options) will be used.
 ```
  window.onload = () {
    const options = {
@@ -42,6 +45,8 @@ If you wish to compile navkeys.js for browser manually, run the `compile_for_bro
 ```
 
 ### Options
+
+#### Default options
 
 ### Modes
 
@@ -73,6 +78,8 @@ For example, if you set the `useClass` value to `focused-class`, then in your CS
 }
 ```
 When an element gets focused, the specified class will be applied to it.
+
+## API
 
 ## Proudly sponsored by
 *Empty...*
