@@ -101,7 +101,16 @@ class NavKeys {
             this.error("'mode' option must be of type string!");
         }
         if(!["auto", "manual", "mixed"].includes(options.mode)){
-            this.error("'mode' options accepts the following values: 'auto', 'manual', 'mixed'");
+            this.error("'mode' option accepts the following values: 'auto', 'manual', 'mixed'");
+        }
+        if(typeof options.keys !== "object" || options.keys === null){
+            this.error("'keys' option must be an object containing the following properties: up, down, left right")
+        }
+        if( typeof options.keys.up !== "number" ||
+            typeof options.keys.down !== "number" ||
+            typeof options.keys.left !== "number" ||
+            typeof options.keys.right !== "number"){
+                this.error("'keys' options's properties must be of type number");
         }
         //If mode is auto, following properties must be specified
         if(options.mode === this.constants.mode.auto){
@@ -180,10 +189,10 @@ class NavKeys {
         }
 
         window.addEventListener("keydown", event => {
-            if( event.keyCode === this.constants.key_code.up ||
-                event.keyCode === this.constants.key_code.down ||
-                event.keyCode === this.constants.key_code.right ||
-                event.keyCode === this.constants.key_code.left ){
+            if( event.keyCode === this.options.keys.up ||
+                event.keyCode === this.options.keys.down ||
+                event.keyCode === this.options.keys.right ||
+                event.keyCode === this.options.keys.left ){
                     const direction = this.keycodeToDirection(event.keyCode);
                     //console.log("Arrow key pressed: " + direction);
                     this.navigate(direction);
@@ -447,6 +456,7 @@ class NavKeys {
 
     //Convert arrow key keycode to direction in string format
     keycodeToDirection(keycode){
+        console.log(keycode);
         this.validateType(keycode, "number");
         switch(keycode){
             case this.options.keys.up:
