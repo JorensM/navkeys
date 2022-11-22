@@ -14,7 +14,9 @@
        * [Manual mode](#manual-mode)
        * [Mixed mode](#mixed-mode)
     * [Styling](#styling)
-       * 
+       * [:focus Styling](#focus-styling)
+       * [useClass Styling](#useclass-styling)
+ * [Proudly sponsored by](#proudly-sponsored-by)
 
 ## Installation
 
