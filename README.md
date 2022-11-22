@@ -3,9 +3,9 @@
  
 ## Table of Contents
  * Installation
-  * NodeJs
-  * CDN
-  * Manual browser bundling
+    * NodeJs
+    * CDN
+    * Manual browser bundling
 
 ## Installation
 
