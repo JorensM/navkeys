@@ -23,6 +23,7 @@
        * [Mixed mode](#mixed-mode)
     * [Functions](#functions)
        * [NavKeys.navigate](#navkeysnavigate)
+       * [NavKeys.addNavElement](#navkeysaddnavelement)
     * [Styling](#styling)
        * [:focus Styling](#focus-styling)
        * [useClass Styling](#useclass-styling)
