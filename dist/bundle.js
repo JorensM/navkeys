@@ -147,6 +147,10 @@ var NavKeys = (function () {
             //Validation
             this.#validateDomEntity(element);
 
+            if(!this.#nav_elements.includes(element)){
+                this.#error("Only navigatable elements can be focused!");
+            }
+
             //Unfocus previous element(if set)
             if(this.#current_element !== null){
                 this.#current_element.blur();
