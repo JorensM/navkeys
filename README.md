@@ -104,6 +104,7 @@ In this mode, navigatable elements will be determined based on the CSS selectors
 
 #### Manual mode
 In this mode, navigatable elements get selected manually by you. This mode is best suited if your website has unique, complex elements that are difficult to define using CSS selectors.
+
 To make an element navigable, add `navkeys` attribute to it. For example:
 ```
 <div class='my-element' navkeys>
@@ -120,6 +121,7 @@ This mode will have both manual and auto modes enabled. This mode is best suited
 
 ##### NavKeys.navigate(direction)
 Use this function to programmatically navigate to another element.
+
 `direction` - Direction in which to navigate. Possible values are `"up"`, `"down"`, `"left"`, `"right"`.
 
 ### Styling
