@@ -22,8 +22,8 @@
        * [Manual mode](#manual-mode)
        * [Mixed mode](#mixed-mode)
     * [Functions](#functions)
-       * [NavKeys.navigate](#navkeysnavigate)
-       * [NavKeys.addNavElement](#navkeysaddnavelement)
+       * [NavKeys.navigate](#navkeysnavigatedirection)
+       * [NavKeys.addNavElement](#navkeysaddnavelementelement)
     * [Styling](#styling)
        * [:focus Styling](#focus-styling)
        * [useClass Styling](#useclass-styling)
@@ -124,6 +124,11 @@ This mode will have both manual and auto modes enabled. This mode is best suited
 Use this function to programmatically navigate to another element.
 
 `direction` - Direction in which to navigate. Possible values are `"up"`, `"down"`, `"left"`, `"right"`.
+
+##### NavKeys.addNavElement(element)
+Add element to navigatable elements list. If element is already in the list, does nothing.
+
+`element` - HTML element
 
 ### Styling
 There are two ways you can style focused elements, depending on which value the `useClass` option is set to.
