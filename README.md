@@ -21,6 +21,8 @@
        * [Auto mode](#auto-mode)
        * [Manual mode](#manual-mode)
        * [Mixed mode](#mixed-mode)
+    * [Functions](#functions)
+       * [NavKeys.navigate](#navkeysnavigate)
     * [Styling](#styling)
        * [:focus Styling](#focus-styling)
        * [useClass Styling](#useclass-styling)
@@ -113,6 +115,12 @@ To make an element navigable, add `navkeys` attribute to it. For example:
 
 #### Mixed mode
 This mode will have both manual and auto modes enabled. This mode is best suited if your website has a mix of repetitive structure as well as unique elements.
+
+### Functions
+
+##### NavKeys.navigate(direction)
+Use this function to programmatically navigate to another element.
+`direction` - Direction in which to navigate. Possible values are `"up"`, `"down"`, `"left"`, `"right"`.
 
 ### Styling
 There are two ways you can style focused elements, depending on which value the `useClass` option is set to.
