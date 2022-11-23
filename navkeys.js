@@ -104,6 +104,10 @@ class NavKeys {
         //Validators
         this.#validateDirection(direction);
 
+        //Variables
+        const options = this.#options;
+        let current_element = this.#current_element;
+
         if(this.#current_element === null){
             this.#current_element = this.#getFirstElement(this.#nav_elements);
             this.focus(this.#current_element);
@@ -118,7 +122,14 @@ class NavKeys {
 
         const target_elements = this.#getElementsInsideArea(this.#nav_elements, nav_area);
         if(target_elements.length > 0){
-            const navigate_to = this.#getClosestElementCenter(this.#current_element, target_elements);
+            let navigate_to = null;
+            if(options.distanceCalculation === "default"){
+                navigate_to = this.#getClosestElement(current_element, target_elements);
+            }else if(options.distanceCalculation === "center"){
+                navigate_to = this.#getClosestElementCenter(this.#current_element, target_elements);
+            }
+            console.log("navigating to: ");
+            console.log(navigate_to);
             this.focus(navigate_to);
         }
     }
@@ -255,6 +266,26 @@ class NavKeys {
         let closest_distance = this.#distanceBetweenElementsCenter(from_element, to_elements[0]);
         to_elements.forEach(to_element => {
             const compare_distance = this.#distanceBetweenElementsCenter(from_element, to_element);
+            if(compare_distance < closest_distance){
+                closest_distance = compare_distance;
+                closest = to_element;
+            }
+        })
+        return closest;
+    }
+
+    //Get closest of a number of elements to a single target element. Calculating closest rects
+    //from_element - HTML element from which to calculate
+    //to_elements - array of HTML element to which to compare
+    #getClosestElement(from_element, to_elements){
+        //Validation
+        this.#validateDomEntity(from_element);
+        this.#validateDomEntities(to_elements);
+
+        let closest = to_elements[0];
+        let closest_distance = this.#distanceBetweenElements(from_element, to_elements[0]);
+        to_elements.forEach(to_element => {
+            const compare_distance = this.#distanceBetweenElements(from_element, to_element);
             if(compare_distance < closest_distance){
                 closest_distance = compare_distance;
                 closest = to_element;
@@ -619,6 +650,14 @@ class NavKeys {
         return this.#distanceBetweenPoints(a_center, b_center);
     }
 
+    //Calculate distance between two elements based on their rects
+    //a, b - HTMLelement
+    #distanceBetweenElements(a, b){
+        const distance = this.#calculateRectDistance(a.getBoundingClientRect(), b.getBoundingClientRect());
+
+        return distance;
+    }
+
      //Calculates distance between 2 rectangles
      #calculateRectDistance(a, b){
         if(this.#doRectsOverlap(a, b)){
@@ -626,59 +665,64 @@ class NavKeys {
         }
 
         let rect_union = this.#rectUnion(a, b);
-
-        rect_union.width -= a.width + b.width;
-        rect_union.width = Math.max(0, rect_union.width); 
-
-        rect_union.height -= a.height + b.height;
-        rect_union.height = Math.max(0, rect_union.height);
         
         return this.#calculateRectDiagonal(rect_union);
     }
 
     #calculateRectDiagonal(rect){
-        point_a = {};
-        point_b = {};
-
-        point_a.x = rect.x + rect.width;
-        point_a.y = rect.y;
-
-        point_b.x = rect.x;
-        point_b.y = rect.y + rect.width;
-
-        return this.#distanceBetweenPoints(point_a, point_b);
+        return Math.sqrt((rect.width ** 2) + (rect.height ** 2))
     }
 
     #rectUnion(a, b){
-        let output_rect = {}
+        let outer_rect = {}
 
-        a_right = a.x + a.width;
-        b_right = b.x + b.width;
+        outer_rect.left = Math.min(a.left, b.left);
+        outer_rect.top = Math.min(a.top, b.top);
+        outer_rect.right = Math.max(a.right, b.right);
+        outer_rect.bottom = Math.max(a.bottom, b.bottom);
 
-        a_bottom = a.y + a.height;
-        b_bottom = b.y + b.height;
+        outer_rect.width = outer_rect.right - outer_rect.left;
+        outer_rect.height = outer_rect.bottom - outer_rect.top;
 
-        most_left = a.x < b.x ? a : b;
-        most_right = a_right > b_right ? a : b;
+        let inner_rect = {};
+        inner_rect.x = 0;
+        inner_rect.y = 0;
+        inner_rect.width = Math.max(0, outer_rect.width - a.width - b.width);
+        inner_rect.height = Math.max(0, outer_rect.height - a.height - b.height);
 
-        upper = a.y < b.y ? a : b;
-        lower = a_bottom > b_bottom ? a : b;
-
-        output_rect.y = Math.min(a.y, b.y);
-        output_rect.x = Math.min(a.x, b.x);
-
-        output_rect.width = most_right.x + most_right.width - most_left.x;
-        output_rect.height = lower.x + lower.height - upper.x;
-
-        return output_rect;
+        return inner_rect;
     }
 
-    #doRectsOverlap(a, b){
-        a_right = a.x + a.width;
-        b_right = b.x + b.width;
+    // #rectUnion(a, b){
+    //     let output_rect = {}
 
-        b_bottom = b.y + b.height;
-        a_bottom = a.y + a.height;
+    //     const a_right = a.x + a.width;
+    //     const b_right = b.x + b.width;
+
+    //     const a_bottom = a.y + a.height;
+    //     const b_bottom = b.y + b.height;
+
+    //     const most_left = a.x < b.x ? a : b;
+    //     const most_right = a_right > b_right ? a : b;
+
+    //     const upper = a.y < b.y ? a : b;
+    //     const lower = a_bottom > b_bottom ? a : b;
+
+    //     output_rect.y = Math.min(a.y, b.y);
+    //     output_rect.x = Math.min(a.x, b.x);
+
+    //     output_rect.width = most_right.x + most_right.width - most_left.x;
+    //     output_rect.height = lower.x + lower.height - upper.x;
+
+    //     return output_rect;
+    // }
+
+    #doRectsOverlap(a, b){
+        const a_right = a.x + a.width;
+        const b_right = b.x + b.width;
+
+        const b_bottom = b.y + b.height;
+        const a_bottom = a.y + a.height;
 
         if( (a.x >= b.x && a.x <= b_right) ||
             (a_right <= b_right && a_right >= b.x)
@@ -742,6 +786,7 @@ class NavKeys {
         useClass: whether to use classes for focus style. If true, pass string for class name, if false, pass boolean false
         comboKey: if comboKey is set, navigation will only work when this key is down. False to disable
         unfocusKey: keycode for the key that will unfocus the focused element. False to disable
+        distanceCalculation: How the closest element is calculated - "default", "center"
     */
     #default_options = {
         mode: this.#constants.mode.auto,
@@ -754,7 +799,8 @@ class NavKeys {
         },
         useClass: false,
         comboKey: false,
-        unfocusKey: false
+        unfocusKey: false,
+        distanceCalculation: "default"
     }
 }
 
