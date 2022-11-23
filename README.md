@@ -15,7 +15,8 @@
        * [autoElements](#autoelements)
        * [comboKey](#combokey)
        * [unfocusKey](#unfocuskey)
-       * [Default options](#default-options) 
+    * [Experimental Options](#experimental-options)
+    * [Default options](#default-options) 
     * [Modes](#modes)
        * [Auto mode](#auto-mode)
        * [Manual mode](#manual-mode)
@@ -72,7 +73,9 @@ If this key is set, navigation will only work when it is held down. Should be a 
 ##### unfocusKey
 If this key is set, currently focused element will blur on press. Should be a number representing a keycode. Set to `false` to disable
 
-#### Default options
+### Experimental options
+
+### Default options
 These are the default options. If an option is not specified when creating a NavKeys instance, default option will be used.
 ```
 default_options = {
