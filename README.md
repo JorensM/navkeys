@@ -34,7 +34,7 @@ To install NavKeys into a NodeJs project, run the command `npm install navkeys`
 To include NavKeys directly in a HTML file, include `script` in your HTML file
 
 ### Manual browser bundling
-If you wish to compile navkeys.js for browser manually, run the `compile_for_browser.bat` file, which will create a browser supported bundle in the `/dist` folder, which you can then include in your HTML using `<script>` tags. **You need *rollup.js* installed globally for the .bat file to work!**
+If you wish to compile navkeys.js for browser manually, run the `compile_for_browser.bat` file, which will create a browser supported bundle in the `/dist` folder, which you can then include in your HTML using `<script>` tags. **You need [rollup.js](rollupjs.org) installed globally for the .bat file to work!**
 
 ## Usage
 
