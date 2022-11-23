@@ -7,53 +7,174 @@ var NavKeys = (function () {
     //---Base class---//
     class NavKeys {
 
-        //---Constants---//
-        #constants = {
-            mode: {
-                auto: "auto",
-                manual: "manual",
-                mixed: "mixed"
-            },
-            key_code: {
-                left: 37,
-                up: 38,
-                right: 39,
-                down: 40
-            },
-            direction: {
-                left: "left",
-                up: "up",
-                right: "right",
-                down: "down"
+
+        //---Constructor---//
+        constructor(options = null){
+            if(!this.#is_browser()){
+                console.log("NavKeys is intended for browsers, not servers!");
+            }
+
+            this.#allow_single_instance();
+
+            //Check options type
+            if(typeof options !== "object" || options === null){
+                this.#error("Options parameter must be of type object or null!");
+            }
+
+            options = {...this.#default_options, ...options};
+
+            this.#validate_options(options);
+
+            this.#options = options;
+
+            if(options.comboKey){
+                this.#is_combo_key_down = false;
+            }else {
+                this.#is_combo_key_down = true;
+            }
+
+            //Add nav_elements for auto/mixed modes
+            if(options.mode === this.#constants.mode.auto || options.mode === this.#constants.mode.mixed){
+                if(options.autoElements === undefined || options.autoElements === null || !Array.isArray(options.autoElements)){
+                    this.#error("Invalid autoElement option!");
+                }else {
+                    //Add elements to nav_elements that match the options.autoElements queries
+                    options.autoElements.forEach(query => {
+                        const elements = document.querySelectorAll(query);
+                        elements.forEach(item => {
+                            this.#nav_elements.push(item);
+                        });
+                    });
+                    //Remove duplicates
+                    this.#nav_elements = this.#arr_remove_duplicates(this.#nav_elements);
+                    if(!options.useClass){
+                        this.#setTabIndex(this.#nav_elements);
+                    }
+                    
+                }
+            }//Add nav_elements for manual mode
+            else if(options.mode === this.#constants.mode.manual);
+            else {
+                throw new Error("Invalid NavKeys mode!");
+            }
+
+            window.addEventListener("keydown", event => {
+                //Prevent scrolling if up/down arrow keys are being used
+                if((event.keyCode === this.#constants.key_code.up && this.#isKeySet(this.#constants.key_code.up)) ||
+                    event.keyCode === this.#constants.key_code.down && this.#isKeySet(this.#constants.key_code.down)){
+                        event.preventDefault();
+                }
+                //console.log(this.#is_combo_key_down);
+                if( (event.keyCode === this.#options.keys.up ||
+                    event.keyCode === this.#options.keys.down ||
+                    event.keyCode === this.#options.keys.right ||
+                    event.keyCode === this.#options.keys.left) && this.#is_combo_key_down ){
+                        const direction = this.#keycodeToDirection(event.keyCode);
+                        this.navigate(direction);
+                }
+                //Check if combo key is down, and set the according variable
+                if(this.#options.comboKey && event.keyCode === this.#options.comboKey){
+                    this.#is_combo_key_down = true;
+                }
+
+                //Unfocus key down, blur element and set current_element to null
+                if(this.#options.unfocusKey && event.keyCode === this.#options.unfocusKey && this.#current_element !== null){
+                    this.#current_element.blur();
+                    if(this.#options.useClass){
+                        this.#current_element.classList.remove(this.#options.useClass);
+                    }
+                    this.#current_element = null;
+                }
+            });
+
+            window.addEventListener("keyup", event => {
+                //Check if combo key is released, and set the according variable
+                if(this.#options.comboKey && event.keyCode === this.#options.comboKey){
+                    this.#is_combo_key_down = false;
+                }
+            });
+        }
+
+        //---Public---//
+
+        //Navigate to another element
+        //direction = "up", "down", "left", "right"
+        navigate(direction){
+
+            //Validators
+            this.#validateDirection(direction);
+
+            if(this.#current_element === null){
+                this.#current_element = this.#getFirstElement(this.#nav_elements);
+                console.log("first element: ");
+                console.log(this.#current_element);
+                this.focus(this.#current_element);
+                return;
+            }
+
+            /*The area in which the navigation will occur
+                (if direction = up, then above the current element, 
+                if direction = right, then to the right of current element, etc.)
+            */
+            let nav_area = this.#calculateNavArea(this.#current_element, direction);
+
+            const target_elements = this.#getElementsInsideArea(this.#nav_elements, nav_area);
+            if(target_elements.length > 0){
+                const navigate_to = this.#getClosestElementCenter(this.#current_element, target_elements);
+                console.log("navigate to: ");
+                console.log(navigate_to);
+                this.focus(navigate_to);
             }
         }
 
-        /* ---Options schema---
-            mode: string | "auto", "manual", "mixed"
-            autoElements: array of querySelectors
-            keys: { 
-                up
-                down
-                left
-                right
+        //Unfocus current element
+        //unfocusCurrentElement(){
+
+
+        //     element.unfocus();
+        // }
+
+        //Adds specified element to nav_elements.
+        addNavElement(element){
+
+            this.#validateDomEntity(element);
+
+            if(!this.#nav_elements.includes(element)){
+                this.#nav_elements.push(element);
+            }else {
+                this.#warn("Could not add element to nav_elements - element already added");
             }
-            useClass: whether to use classes for focus style. If true, pass string for class name, if false, pass boolean false
-            comboKey: if comboKey is set, navigation will only work when this key is down. False to disable
-            unfocusKey: keycode for the key that will unfocus the focused element. False to disable
-        */
-        #default_options = {
-            mode: this.#constants.mode.auto,
-            autoElements: ["a", "button", "p", "li", "h1, h2, h3, h4, h5, h6"],
-            keys: {
-                up: this.#constants.key_code.up,
-                down: this.#constants.key_code.down,
-                left: this.#constants.key_code.left,
-                right: this.#constants.key_code.right
-            },
-            useClass: false,
-            comboKey: false,
-            unfocusKey: false
         }
+
+        //Focus element
+        //element - HTMLelement to focus
+        focus(element){
+            //Validation
+            this.#validateDomEntity(element);
+
+            //Unfocus previous element(if set)
+            if(this.#current_element !== null){
+                this.#current_element.blur();
+                
+                //Remove focus class from previous element
+                if(this.#options.useClass){
+                    this.#current_element.classList.remove(this.#options.useClass);
+                }
+            }
+            
+
+            //Focus new element
+            element.focus();
+            this.#current_element = element;
+            //Add focus class to new element
+            if(this.#options.useClass){
+                this.#current_element.classList.add(this.#options.useClass);
+            }
+        }
+
+        //---Public END---//
+
+        //---Checkers---//
 
         //Check if script is running in browser or server
         #is_browser(){
@@ -62,9 +183,6 @@ var NavKeys = (function () {
             }
             return false;   
         }
-
-
-        
 
         //Check if specified css selector is valid
         #isSelectorValid(selector){
@@ -82,28 +200,196 @@ var NavKeys = (function () {
             return document.createDocumentFragment().querySelector(selector);
         }
 
-        //Throws formatted error
-        #error(string){
-            if(typeof string !== "string"){
-                throw new Error("NavKeys: Parameter must be of type string!");
-            }
-            throw new Error("NavKeys: " + string);
+        //Check if given keycode is used as a key in options
+        #isKeySet(keycode){
+
+            const keys = this.#options.keys;
+
+            return [keys.up, keys.down, keys.left, keys.right].includes(keycode);
         }
 
-        //Shows formatted warning in console
-        #warn(string){
-            this.#validateType(string, "string");
-            console.warn("NavKeys: " + string);
-        }
-
-        //Checks if there is already an instance of NavKeys and throws error if there already is one
-        #allow_single_instance(){
-            if(navkeys_instance === null){
-                navkeys_instance = this;
-            }else {
-                throw new Error("Only one instance of NavKeys is allowed!");
+        //Check if entity is a DOM element
+        #isDomEntity(entity) {
+            if(typeof entity  === 'object' && entity.nodeType !== undefined){
+               return true;
+            }
+            else {
+               return false;
             }
         }
+
+        //Check if array contains only DOM elements
+        #areDomEntities(array){
+            if(!Array.isArray(array)){
+                this.#error("Parameter must be an array!");
+            }
+            let all_entities = true;
+            array.forEach(entity => {
+                if(!this.#isDomEntity(entity)){
+                    all_entities = false;
+                }
+            });
+            return all_entities;
+        }
+
+        //---Checkers END---//
+
+        //---Getters---//
+
+        //Get closest of a number of elements to a single target element. Calculating from element's center position
+        //from_element - HTML element from which to calculate
+        //to_elements - array of HTML element to which to compare
+        #getClosestElementCenter(from_element, to_elements){
+
+            //Validation
+            this.#validateDomEntity(from_element);
+            this.#validateDomEntities(to_elements);
+
+            let closest = to_elements[0];
+            let closest_distance = this.#distanceBetweenElementsCenter(from_element, to_elements[0]);
+            to_elements.forEach(to_element => {
+                const compare_distance = this.#distanceBetweenElementsCenter(from_element, to_element);
+                console.log("to_element: ");
+                console.log(to_element);
+                console.log(compare_distance);
+                if(compare_distance < closest_distance){
+                    closest_distance = compare_distance;
+                    closest = to_element;
+                }
+            });
+            return closest;
+        }
+
+        //Get highest nav_element from an array of elements
+        #getTopmostElements(elements){
+
+            this.#validateDomEntities(elements);
+            if(elements.length < 1){
+                throw new Error("Nav elements count = 0");
+            }
+            let highest_element = elements[0];
+            elements.forEach(element => {
+                if(element.getBoundingClientRect().y < highest_element.getBoundingClientRect().y){
+                    highest_element = element;
+                }
+            });
+            let highest_elements = [];
+            elements.forEach(element => {
+                if(element.getBoundingClientRect().y === highest_element.getBoundingClientRect().y){
+                    highest_elements.push(element);
+                }
+            });
+            //if(highest_elements.length > 1){
+                //return highest_elements;
+            //}
+            return highest_elements;
+        }
+
+        //Get leftmost nav_element from an array of elements
+        #getLeftmostElements(elements){
+
+            this.#validateDomEntities(elements);
+
+            if(elements.length < 1){
+                throw new Error("Nav elements count = 0");
+            }
+            let leftmost_element = elements[0];
+            console.log("elems: ");
+            console.log(elements);
+            elements.forEach(element => {
+                if(element.getBoundingClientRect().x < leftmost_element.getBoundingClientRect().x){
+                    leftmost_element = element;
+                }
+            });
+
+            let leftmost_elements = [];
+            elements.forEach(element => {
+                if(element.getBoundingClientRect().x === leftmost_element.getBoundingClientRect().x){
+                    leftmost_elements.push(element);
+                }
+            });
+            return leftmost_elements;
+        }
+
+        //Get leftmost + topmost element from an array of elements
+        #getFirstElement(elements){
+            elements = this.#getTopmostElements(elements);
+            console.log("topmost: ");
+            console.log(elements);
+           
+            elements = this.#getLeftmostElements(elements);
+            console.log("leftmost: ");
+            console.log(elements);
+            return elements[0];
+        }
+
+        //Get elements that are contained inside an area
+        //elements - HTML elements
+        //area - {x, y, width, height}
+        //Returns array of filtered elements
+        #getElementsInsideArea(elements, area){
+
+            //Validation
+            this.#validateDomEntities(elements);
+            this.#validateArea(area);
+
+            let output = [];
+            elements.forEach(element => {
+                const rect = element.getBoundingClientRect();
+                if( 
+                    rect.left >= area.x && 
+                    rect.right <= (area.x + area.width) &&
+                    rect.top >= area.y &&
+                    rect.bottom <= area.y + area.height
+                ){
+                    output.push(element);
+                }
+            });
+            return output;
+        }
+
+        //Get center position of element's client rect
+        //Returns {x, y}
+        #getElementCenterPosition(element){
+
+            //Validation
+            this.#validateDomEntity(element);
+
+            const rect = element.getBoundingClientRect();
+            const x = rect.x + (rect.width / 2);
+            const y = rect.y + (rect.height / 2);
+
+            return {x, y};
+        }
+
+        //---Getters END---//
+
+        //---Setters---//
+
+        //Set tab index attribute for elements.
+        //Necessary to make elements such as 'p' focusable
+        #setTabIndex(elements){
+            console.log(elements);
+            if(!Array.isArray(elements)){
+                this.#error("Parameter must be an array!");
+            }
+            if(!this.#areDomEntities(elements)){
+                this.#error("Array must only contain DOM elements!");
+            }
+            elements.forEach(element => {
+                const current_tab_index = +element.getAttribute("tabindex");
+                console.log("tabindex:");
+                console.log(current_tab_index);
+                //Only set tab index if it hasn't already been set
+                if(current_tab_index === 0){
+                    element.setAttribute("tabindex", "-1");
+                }
+            });
+        }
+
+        //---Setters END---//
+
+        //---Validators---//
 
         //Validates options object
         #validate_options(options){
@@ -151,207 +437,6 @@ var NavKeys = (function () {
                 if(!all_valid){
                     this.#error("'autoElements' array's elements must be valid CSS selectors!");
                 }
-            }
-        }
-
-        //---Constructor---//
-        constructor(options = null){
-            if(!this.#is_browser()){
-                console.log("NavKeys is intended for browsers, not servers!");
-            }
-
-            this.#allow_single_instance();
-
-            //Check options type
-            if(typeof options !== "object" || options === null){
-                this.#error("Options parameter must be of type object or null!");
-            }
-
-            options = {...this.#default_options, ...options};
-
-            this.#validate_options(options);
-
-            this.#options = options;
-
-            if(options.comboKey){
-                this.#is_combo_key_down = false;
-            }else {
-                this.#is_combo_key_down = true;
-            }
-
-            //Add nav_elements for auto/mixed modes
-            if(options.mode === this.#constants.mode.auto || options.mode === this.#constants.mode.mixed){
-                if(options.autoElements === undefined || options.autoElements === null || !Array.isArray(options.autoElements)){
-                    this.#error("Invalid autoElement option!");
-                }else {
-                    //Add elements to nav_elements that match the options.autoElements queries
-                    options.autoElements.forEach(query => {
-                        //console.log("query: " + query);
-                        const elements = document.querySelectorAll(query);
-                        elements.forEach(item => {
-                            //console.log(item);
-                            this.#nav_elements.push(item);
-                        });
-                    });
-                    //Remove duplicates
-                    this.#nav_elements = this.#arr_remove_duplicates(this.#nav_elements);
-                    if(!options.useClass){
-                        this.#setTabIndex(this.#nav_elements);
-                    }
-                    
-                }
-            }//Add nav_elements for manual mode
-            else if(options.mode === this.#constants.mode.manual);
-            else {
-                throw new Error("Invalid NavKeys mode!");
-            }
-
-            window.addEventListener("keydown", event => {
-                //Prevent scrolling if up/down arrow keys are being used
-                if((event.keyCode === this.#constants.key_code.up && this.#isKeySet(this.#constants.key_code.up)) ||
-                    event.keyCode === this.#constants.key_code.down && this.#isKeySet(this.#constants.key_code.down)){
-                        event.preventDefault();
-                }
-                //console.log(this.#is_combo_key_down);
-                if( (event.keyCode === this.#options.keys.up ||
-                    event.keyCode === this.#options.keys.down ||
-                    event.keyCode === this.#options.keys.right ||
-                    event.keyCode === this.#options.keys.left) && this.#is_combo_key_down ){
-                        const direction = this.#keycodeToDirection(event.keyCode);
-                        //console.log("Arrow key pressed: " + direction);
-                        this.navigate(direction);
-                }
-                //Check if combo key is down, and set the according variable
-                if(this.#options.comboKey && event.keyCode === this.#options.comboKey){
-                    this.#is_combo_key_down = true;
-                }
-
-                //Unfocus key down, blur element and set current_element to null
-                if(this.#options.unfocusKey && event.keyCode === this.#options.unfocusKey && this.#current_element !== null){
-                    this.#current_element.blur();
-                    if(this.#options.useClass){
-                        this.#current_element.classList.remove(this.#options.useClass);
-                    }
-                    this.#current_element = null;
-                }
-            });
-
-            window.addEventListener("keyup", event => {
-                //Check if combo key is released, and set the according variable
-                if(this.#options.comboKey && event.keyCode === this.#options.comboKey){
-                    this.#is_combo_key_down = false;
-                }
-            });
-        }
-
-        //Check if given keycode is used as a key in options
-        #isKeySet(keycode){
-
-            const keys = this.#options.keys;
-
-            return [keys.up, keys.down, keys.left, keys.right].includes(keycode);
-        }
-
-
-        //Set tab index attribute for elements.
-        //Necessary to make elements such as 'p' focusable
-        #setTabIndex(elements){
-            console.log(elements);
-            if(!Array.isArray(elements)){
-                this.#error("Parameter must be an array!");
-            }
-            if(!this.#areDomEntities(elements)){
-                this.#error("Array must only contain DOM elements!");
-            }
-            elements.forEach(element => {
-                const current_tab_index = +element.getAttribute("tabindex");
-                console.log("tabindex:");
-                console.log(current_tab_index);
-                //Only set tab index if it hasn't already been set
-                if(current_tab_index === 0){
-                    element.setAttribute("tabindex", "-1");
-                }
-            });
-        }
-
-        //Check if entity is a DOM element
-        #isDomEntity(entity) {
-            if(typeof entity  === 'object' && entity.nodeType !== undefined){
-               return true;
-            }
-            else {
-               return false;
-            }
-        }
-
-        //Check if array contains only DOM elements
-        #areDomEntities(array){
-            if(!Array.isArray(array)){
-                this.#error("Parameter must be an array!");
-            }
-            let all_entities = true;
-            array.forEach(entity => {
-                if(!this.#isDomEntity(entity)){
-                    all_entities = false;
-                }
-            });
-            return all_entities;
-        }
-
-        //Navigate to another element
-        //Direction = "up", "down", "left", "right"
-        navigate(direction){
-
-            this.#validateDirection(direction);
-
-            if(this.#current_element === null){
-               // this.#current_element = this.#getTompostElements(this.#nav_elements)[0];
-                this.#current_element = this.#getFirstElement(this.#nav_elements);
-                console.log("first element: ");
-                console.log(this.#current_element);
-                this.focus(this.#current_element);
-                return;
-            }
-            //console.log(this.#current_element);
-            //this.#current_element = document.activeElement;
-
-            /*The area in which the navigation will occur
-                (if direction = up, then above the current element, 
-                if direction = right, then to the right of current element, etc.)
-            */
-            let nav_area = this.#calculateNavArea(this.#current_element, direction);
-            
-            
-
-            //let target_elements = [];
-
-            
-            
-
-            const target_elements = this.#getElementsInsideArea(this.#nav_elements, nav_area);
-            if(target_elements.length > 0){
-                const navigate_to = this.#getClosestElementCenter(this.#current_element, target_elements);
-                console.log("navigate to: ");
-                console.log(navigate_to);
-                this.focus(navigate_to);
-            }
-
-            //console.log(target_elements);
-
-            //this.#draw_nav_area(nav_area);
-
-            //console.log(nav_area);
-        }
-
-        //Adds specified element to nav_elements.
-        addNavElement(element){
-
-            this.#validateDomEntity(element);
-
-            if(!this.#nav_elements.includes(element)){
-                this.#nav_elements.push(element);
-            }else {
-                this.#warn("Could not add element to nav_elements - element already added");
             }
         }
 
@@ -409,42 +494,32 @@ var NavKeys = (function () {
             this.#validateType(target.y, "number");
         }
 
-        //Focus element
-        //element - HTMLelement to focus
-        focus(element){
-            //Validation
-            this.#validateDomEntity(element);
+        //---Validators END---//
 
-            //Unfocus previous element(if set)
-            if(this.#current_element !== null){
-                //console.log(this.#current_element);
-                this.#current_element.blur();
-                
-                //Remove focus class from previous element
-                if(this.#options.useClass){
-                    this.#current_element.classList.remove(this.#options.useClass);
-                }
-            }
-            
+        //---Misc---//
 
-            //Focus new element
-            element.focus();
-            this.#current_element = element;
-            //Add focus class to new element
-            if(this.#options.useClass){
-                this.#current_element.classList.add(this.#options.useClass);
+        //Throws formatted error
+        #error(string){
+            if(typeof string !== "string"){
+                throw new Error("NavKeys: Parameter must be of type string!");
             }
-            //console.log("useclass: ");
-            //console.log(this.#options.useClass);
+            throw new Error("NavKeys: " + string);
         }
 
-        // //Unfocus element
-        // //element - HTMLElement to unfocus.
-        // unfocus(element){
-        //     this.#validateDomEntity(element);
+        //Shows formatted warning in console
+        #warn(string){
+            this.#validateType(string, "string");
+            console.warn("NavKeys: " + string);
+        }
 
-        //     element.unfocus();
-        // }
+        //Checks if there is already an instance of NavKeys and throws error if there already is one
+        #allow_single_instance(){
+            if(navkeys_instance === null){
+                navkeys_instance = this;
+            }else {
+                throw new Error("Only one instance of NavKeys is allowed!");
+            }
+        }
 
         //Draw nav area, for debug
         #draw_nav_area(area){
@@ -462,8 +537,7 @@ var NavKeys = (function () {
             this.#nav_area_element.style.border = "2px solid red";
             document.body.appendChild(this.#nav_area_element);
         }
-        #nav_area_element = null;
-
+        
         //Remove duplicates in an array
         #arr_remove_duplicates(arr){
             //Validation
@@ -477,10 +551,6 @@ var NavKeys = (function () {
         //element - HTMLelement relative to which to calculate
         //direction - "up", "down", "left", "right"
         #calculateNavArea(element, direction){
-
-            //console.log("calculating nav area: ");
-            //console.log(element);
-            //console.log(direction);
 
             this.#validateDomEntity(element);
             this.#validateDirection(direction);
@@ -538,111 +608,6 @@ var NavKeys = (function () {
             }
         }
 
-        //Get highest nav_element from an array of elements
-        #getTopmostElements(elements){
-
-            this.#validateDomEntities(elements);
-            //console.log("elements");
-            //console.log(elements);
-            if(elements.length < 1){
-                throw new Error("Nav elements count = 0");
-            }
-            let highest_element = elements[0];
-            elements.forEach(element => {
-                if(element.getBoundingClientRect().y < highest_element.getBoundingClientRect().y){
-                    highest_element = element;
-                }
-            });
-            let highest_elements = [];
-            elements.forEach(element => {
-                if(element.getBoundingClientRect().y === highest_element.getBoundingClientRect().y){
-                    highest_elements.push(element);
-                }
-            });
-            //if(highest_elements.length > 1){
-                //return highest_elements;
-            //}
-            return highest_elements;
-        }
-
-        //Get leftmost nav_element from an array of elements
-        #getLeftmostElements(elements){
-
-            this.#validateDomEntities(elements);
-
-            if(elements.length < 1){
-                throw new Error("Nav elements count = 0");
-            }
-            let leftmost_element = elements[0];
-            console.log("elems: ");
-            console.log(elements);
-            elements.forEach(element => {
-                if(element.getBoundingClientRect().x < leftmost_element.getBoundingClientRect().x){
-                    leftmost_element = element;
-                }
-            });
-
-            let leftmost_elements = [];
-            elements.forEach(element => {
-                if(element.getBoundingClientRect().x === leftmost_element.getBoundingClientRect().x){
-                    leftmost_elements.push(element);
-                }
-            });
-            return leftmost_elements;
-        }
-
-        //Get leftmost + topmost element from an array of elements
-        #getFirstElement(elements){
-            elements = this.#getTopmostElements(elements);
-            //this.#getTom
-            console.log("topmost: ");
-            console.log(elements);
-           
-            elements = this.#getLeftmostElements(elements);
-            console.log("leftmost: ");
-            console.log(elements);
-            return elements[0];
-        }
-
-        //Get elements that are contained inside an area
-        //elements - HTML elements
-        //area - {x, y, width, height}
-        //Returns array of filtered elements
-        #getElementsInsideArea(elements, area){
-
-            //Validation
-            this.#validateDomEntities(elements);
-            this.#validateArea(area);
-
-            let output = [];
-            elements.forEach(element => {
-                const rect = element.getBoundingClientRect();
-                if( 
-                    rect.left >= area.x && 
-                    rect.right <= (area.x + area.width) &&
-                    rect.top >= area.y &&
-                    rect.bottom <= area.y + area.height
-                ){
-                    output.push(element);
-                }
-            });
-            return output;
-        }
-
-        //Get center position of element's client rect
-        //Returns {x, y}
-        #getElementCenterPosition(element){
-
-            //Validation
-            this.#validateDomEntity(element);
-
-            const rect = element.getBoundingClientRect();
-            const x = rect.x + (rect.width / 2);
-            const y = rect.y + (rect.height / 2);
-
-            return {x, y};
-        }
-
         //Get distance between two points
         //a, b - {x, y}
         #distanceBetweenPoints(a, b){
@@ -665,31 +630,9 @@ var NavKeys = (function () {
             return this.#distanceBetweenPoints(a_center, b_center);
         }
 
-        //Get closest of a number of elements to a single target element. Calculating from element's center position
-        //from_element - HTML element from which to calculate
-        //to_elements - array of HTML element to which to compare
-        #getClosestElementCenter(from_element, to_elements){
+        //---Misc END---//
 
-            //Validation
-            this.#validateDomEntity(from_element);
-            this.#validateDomEntities(to_elements);
-
-            let closest = to_elements[0];
-            let closest_distance = this.#distanceBetweenElementsCenter(from_element, to_elements[0]);
-            to_elements.forEach(to_element => {
-                const compare_distance = this.#distanceBetweenElementsCenter(from_element, to_element);
-                console.log("to_element: ");
-                console.log(to_element);
-                console.log(compare_distance);
-                if(compare_distance < closest_distance){
-                    closest_distance = compare_distance;
-                    closest = to_element;
-                }
-            });
-            return closest;
-        }
-
-        
+        //---Variables---//
 
         //Elements that are navigatable
         #nav_elements = [];
@@ -701,6 +644,56 @@ var NavKeys = (function () {
 
         //Whether the combo key is currently held down
         #is_combo_key_down = true;
+
+        //---Constants---//
+        #constants = {
+            mode: {
+                auto: "auto",
+                manual: "manual",
+                mixed: "mixed"
+            },
+            key_code: {
+                left: 37,
+                up: 38,
+                right: 39,
+                down: 40
+            },
+            direction: {
+                left: "left",
+                up: "up",
+                right: "right",
+                down: "down"
+            }
+        }
+
+        #nav_area_element = null;
+
+        /* ---Options schema---
+            mode: string | "auto", "manual", "mixed"
+            autoElements: array of querySelectors
+            keys: { 
+                up
+                down
+                left
+                right
+            }
+            useClass: whether to use classes for focus style. If true, pass string for class name, if false, pass boolean false
+            comboKey: if comboKey is set, navigation will only work when this key is down. False to disable
+            unfocusKey: keycode for the key that will unfocus the focused element. False to disable
+        */
+        #default_options = {
+            mode: this.#constants.mode.auto,
+            autoElements: ["a", "button", "p", "li", "h1, h2, h3, h4, h5, h6"],
+            keys: {
+                up: this.#constants.key_code.up,
+                down: this.#constants.key_code.down,
+                left: this.#constants.key_code.left,
+                right: this.#constants.key_code.right
+            },
+            useClass: false,
+            comboKey: false,
+            unfocusKey: false
+        }
     }
 
     return NavKeys;
