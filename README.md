@@ -76,7 +76,7 @@ If this key is set, currently focused element will blur on press. Should be a nu
 These are the default options. If an option is not specified when creating a NavKeys instance, default option will be used.
 ```
 default_options = {
-        mode: this.constants.mode.auto,
+        mode: "auto",
         autoElements: ["a", "button", "p", "li", "h1, h2, h3, h4, h5, h6"],
         keys: {
             up: 38,
