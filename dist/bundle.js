@@ -11,7 +11,7 @@ var NavKeys = (function () {
         //---Constructor---//
         constructor(options = null){
             if(!this.#is_browser()){
-                console.log("NavKeys is intended for browsers, not servers!");
+                this.#error("NavKeys is intended for browsers, not servers!");
             }
 
             this.#allow_single_instance();
@@ -64,7 +64,6 @@ var NavKeys = (function () {
                     event.keyCode === this.#constants.key_code.down && this.#isKeySet(this.#constants.key_code.down)){
                         event.preventDefault();
                 }
-                //console.log(this.#is_combo_key_down);
                 if( (event.keyCode === this.#options.keys.up ||
                     event.keyCode === this.#options.keys.down ||
                     event.keyCode === this.#options.keys.right ||
@@ -106,8 +105,6 @@ var NavKeys = (function () {
 
             if(this.#current_element === null){
                 this.#current_element = this.#getFirstElement(this.#nav_elements);
-                console.log("first element: ");
-                console.log(this.#current_element);
                 this.focus(this.#current_element);
                 return;
             }
@@ -121,8 +118,6 @@ var NavKeys = (function () {
             const target_elements = this.#getElementsInsideArea(this.#nav_elements, nav_area);
             if(target_elements.length > 0){
                 const navigate_to = this.#getClosestElementCenter(this.#current_element, target_elements);
-                console.log("navigate to: ");
-                console.log(navigate_to);
                 this.focus(navigate_to);
             }
         }
@@ -249,9 +244,6 @@ var NavKeys = (function () {
             let closest_distance = this.#distanceBetweenElementsCenter(from_element, to_elements[0]);
             to_elements.forEach(to_element => {
                 const compare_distance = this.#distanceBetweenElementsCenter(from_element, to_element);
-                console.log("to_element: ");
-                console.log(to_element);
-                console.log(compare_distance);
                 if(compare_distance < closest_distance){
                     closest_distance = compare_distance;
                     closest = to_element;
@@ -294,8 +286,6 @@ var NavKeys = (function () {
                 throw new Error("Nav elements count = 0");
             }
             let leftmost_element = elements[0];
-            console.log("elems: ");
-            console.log(elements);
             elements.forEach(element => {
                 if(element.getBoundingClientRect().x < leftmost_element.getBoundingClientRect().x){
                     leftmost_element = element;
@@ -314,12 +304,7 @@ var NavKeys = (function () {
         //Get leftmost + topmost element from an array of elements
         #getFirstElement(elements){
             elements = this.#getTopmostElements(elements);
-            console.log("topmost: ");
-            console.log(elements);
-           
             elements = this.#getLeftmostElements(elements);
-            console.log("leftmost: ");
-            console.log(elements);
             return elements[0];
         }
 
@@ -369,7 +354,6 @@ var NavKeys = (function () {
         //Set tab index attribute for elements.
         //Necessary to make elements such as 'p' focusable
         #setTabIndex(elements){
-            console.log(elements);
             if(!Array.isArray(elements)){
                 this.#error("Parameter must be an array!");
             }
@@ -378,8 +362,6 @@ var NavKeys = (function () {
             }
             elements.forEach(element => {
                 const current_tab_index = +element.getAttribute("tabindex");
-                console.log("tabindex:");
-                console.log(current_tab_index);
                 //Only set tab index if it hasn't already been set
                 if(current_tab_index === 0){
                     element.setAttribute("tabindex", "-1");
@@ -557,7 +539,6 @@ var NavKeys = (function () {
             
             //Element's bounding box
             const current_rect = element.getBoundingClientRect();
-            console.log(element);
 
             //Document width and height
             const dw = document.documentElement.clientWidth;
@@ -570,8 +551,6 @@ var NavKeys = (function () {
                 nav_area.y = 0;
                 nav_area.width = dw;
                 nav_area.height = current_rect.y;
-                console.log("h: ");
-                console.log(nav_area.height);
             }else if(direction === this.#constants.direction.down){
                 nav_area.x = 0;
                 nav_area.y = current_rect.bottom - 1;
@@ -594,7 +573,6 @@ var NavKeys = (function () {
 
         //Convert arrow key keycode to direction in string format
         #keycodeToDirection(keycode){
-            console.log(keycode);
             this.#validateType(keycode, "number");
             switch(keycode){
                 case this.#options.keys.up:
