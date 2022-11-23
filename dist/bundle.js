@@ -122,12 +122,18 @@ var NavKeys = (function () {
             }
         }
 
-        //Unfocus current element
-        //unfocusCurrentElement(){
+        //Unfocus currently focused element
+        unfocusCurrentElement(){
+            const current_element = this.#current_element;
+            const options = this.#options;
 
-
-        //     element.unfocus();
-        // }
+            if(current_element !== null){
+                current_element.blur();
+                if(options.useClass){
+                    current_element.classList.remove(options.useClass);
+                } 
+            }
+        }
 
         //Adds specified element to nav_elements.
         addNavElement(element){
