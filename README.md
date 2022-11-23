@@ -101,7 +101,15 @@ There are 3 possible modes for NavKeys - **Auto** mode, **Manual** mode, and **M
 In this mode, navigatable elements will be determined based on the CSS selectors passed to the `autoElements` option. This mode is best suited if your website has a repetitive structure and if the navigatable elements can be easily defined with CSS selectors
 
 #### Manual mode
-In this mode, navigatable elements will be those elements that have the attribute `navkeys` set to them. This mode is best suited if your website has unique, complex elements that are difficult to define using CSS selectors.
+In this mode, navigatable elements get selected manually by you. This mode is best suited if your website has unique, complex elements that are difficult to define using CSS selectors.
+To make an element navigable, add `navkeys` attribute to it. For example:
+```
+<div class='my-element' navkeys>
+
+</div>
+```
+
+
 
 #### Mixed mode
 This mode will have both manual and auto modes enabled. This mode is best suited if your website has a mix of repetitive structure as well as unique elements.
