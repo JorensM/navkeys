@@ -23,6 +23,7 @@
        * [Mixed mode](#mixed-mode)
     * [Functions](#functions)
        * [NavKeys.navigate](#navkeysnavigatedirection)
+       * [NavKeys.focus](#navkeysfocuselement)
        * [NavKeys.addNavElement](#navkeysaddnavelementelement)
     * [Styling](#styling)
        * [:focus Styling](#focus-styling)
@@ -113,8 +114,6 @@ To make an element navigable, add `navkeys` attribute to it. For example:
 </div>
 ```
 
-
-
 #### Mixed mode
 This mode will have both manual and auto modes enabled. This mode is best suited if your website has a mix of repetitive structure as well as unique elements.
 
@@ -124,6 +123,11 @@ This mode will have both manual and auto modes enabled. This mode is best suited
 Use this function to programmatically navigate to another element.
 
 `direction` - Direction in which to navigate. Possible values are `"up"`, `"down"`, `"left"`, `"right"`.
+
+##### NavKeys.focus(element)
+Programmatically focus a navigatable element. Will throw error if target element is not in navigatable elements list
+
+`element` - HTML element to focus
 
 ##### NavKeys.addNavElement(element)
 Add element to navigatable elements list. If element is already in the list, does nothing.
