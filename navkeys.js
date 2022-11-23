@@ -84,9 +84,15 @@ class NavKeys {
     //Throws formatted error
     error(string){
         if(typeof string !== "string"){
-            throw new Error("Parameter must be of type string!");
+            throw new Error("NavKeys: Parameter must be of type string!");
         }
         throw new Error("NavKeys: " + string);
+    }
+
+    //Shows formatted warning in console
+    warn(string){
+        this.validateType(string, "string");
+        console.warn("NavKeys: " + string);
     }
 
     //Checks if there is already an instance of NavKeys and throws error if there already is one
@@ -336,6 +342,18 @@ class NavKeys {
         //this.draw_nav_area(nav_area);
 
         //console.log(nav_area);
+    }
+
+    //Adds specified element to nav_elements.
+    addNavElement(element){
+
+        this.validateDomEntity(element);
+
+        if(!this.nav_elements.includes(element)){
+            this.nav_elements.push(element);
+        }else{
+            this.warn("Could not add element to nav_elements - element already added");
+        }
     }
 
     //Validates direction
