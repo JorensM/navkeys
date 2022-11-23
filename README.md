@@ -74,6 +74,7 @@ If this key is set, navigation will only work when it is held down. Should be a 
 If this key is set, currently focused element will blur on press. Should be a number representing a keycode. Set to `false` to disable
 
 ### Experimental options
+The following options are experimental. It is not recommended that you change them unless you know what you're doing, as they might have unexpected/buggy behavior
 
 ### Default options
 These are the default options. If an option is not specified when creating a NavKeys instance, default option will be used.
