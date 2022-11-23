@@ -24,6 +24,7 @@
     * [Functions](#functions)
        * [NavKeys.navigate](#navkeysnavigatedirection)
        * [NavKeys.focus](#navkeysfocuselement)
+       * [NavKeys.unfocusCurrentElement](navkeysunfocuscurrentelement)
        * [NavKeys.addNavElement](#navkeysaddnavelementelement)
     * [Styling](#styling)
        * [:focus Styling](#focus-styling)
@@ -128,6 +129,9 @@ Use this function to programmatically navigate to another element.
 Programmatically focus a navigatable element. Will throw error if target element is not in navigatable elements list
 
 `element` - HTML element to focus
+
+##### NavKeys.unfocusCurrentElement()
+Unfocuses currently focused element, if there is one
 
 ##### NavKeys.addNavElement(element)
 Add element to navigatable elements list. If element is already in the list, does nothing.
