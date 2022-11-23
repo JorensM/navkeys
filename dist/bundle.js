@@ -618,6 +618,79 @@ var NavKeys = (function () {
             return this.#distanceBetweenPoints(a_center, b_center);
         }
 
+         //Calculates distance between 2 rectangles
+         #calculateRectDistance(a, b){
+            if(this.#doRectsOverlap(a, b)){
+                return 0;
+            }
+
+            let rect_union = this.#rectUnion(a, b);
+
+            rect_union.width -= a.width + b.width;
+            rect_union.width = Math.max(0, rect_union.width); 
+
+            rect_union.height -= a.height + b.height;
+            rect_union.height = Math.max(0, rect_union.height);
+            
+            return this.#calculateRectDiagonal(rect_union);
+        }
+
+        #calculateRectDiagonal(rect){
+            point_a = {};
+            point_b = {};
+
+            point_a.x = rect.x + rect.width;
+            point_a.y = rect.y;
+
+            point_b.x = rect.x;
+            point_b.y = rect.y + rect.width;
+
+            return this.#distanceBetweenPoints(point_a, point_b);
+        }
+
+        #rectUnion(a, b){
+            let output_rect = {};
+
+            a_right = a.x + a.width;
+            b_right = b.x + b.width;
+
+            a_bottom = a.y + a.height;
+            b_bottom = b.y + b.height;
+
+            most_left = a.x < b.x ? a : b;
+            most_right = a_right > b_right ? a : b;
+
+            upper = a.y < b.y ? a : b;
+            lower = a_bottom > b_bottom ? a : b;
+
+            output_rect.y = Math.min(a.y, b.y);
+            output_rect.x = Math.min(a.x, b.x);
+
+            output_rect.width = most_right.x + most_right.width - most_left.x;
+            output_rect.height = lower.x + lower.height - upper.x;
+
+            return output_rect;
+        }
+
+        #doRectsOverlap(a, b){
+            a_right = a.x + a.width;
+            b_right = b.x + b.width;
+
+            b_bottom = b.y + b.height;
+            a_bottom = a.y + a.height;
+
+            if( (a.x >= b.x && a.x <= b_right) ||
+                (a_right <= b_right && a_right >= b.x)
+            ){
+                if( (a.y >= b.y && a.y <= b_bottom) ||
+                    (a_bottom >= b.y && a_bottom <= b_bottom)
+                ){
+                    return true;
+                }
+            }
+            return false;
+        }
+
         //---Misc END---//
 
         //---Variables---//
