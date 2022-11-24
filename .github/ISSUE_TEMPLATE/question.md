@@ -2,7 +2,7 @@
 name: Question
 about: Ask question about NavKeys
 title: ''
-labels: ''
+labels: question
 assignees: ''
 
 ---
