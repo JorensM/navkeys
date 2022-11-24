@@ -4,7 +4,17 @@ about: Submit a bug report
 title: ''
 labels: ''
 assignees: ''
-
+body:
+  type: dropdown
+    id: version
+    attributes:
+      label: Version
+      description: What version of our software are you running?
+      options:
+        - 0.5
+        - 1.0 (Latest)
+    validations:
+      required: true
 ---
 
 
