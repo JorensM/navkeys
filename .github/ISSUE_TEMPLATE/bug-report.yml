@@ -10,7 +10,7 @@ body:
       description: What version of our software are you running?
       options:
         - 0.5
-        - 1.0 (Latest)
+        - 1.0 (Default)
     validations:
       required: true
 
