@@ -9,8 +9,8 @@ body:
       label: Version
       description: What version of NavKeys are you using?
       options:
-        - 0.5
         - 1.0 (Latest)
+        - 0.5
     validations:
       required: true
   - type: dropdown
@@ -24,6 +24,17 @@ body:
         - Safari
         - Opera
         - Edge
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: device
+    attributes:
+      label: Browser
+      description: What type of device are you using?
+      options:
+        - Dekstop
+        - Mobile/Tablet
     validations:
       required: true
 
