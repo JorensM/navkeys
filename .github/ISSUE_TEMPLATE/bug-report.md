@@ -5,7 +5,7 @@ title: ''
 labels: ''
 assignees: ''
 body:
-  type: dropdown
+  - type: dropdown
     id: version
     attributes:
       label: Version
