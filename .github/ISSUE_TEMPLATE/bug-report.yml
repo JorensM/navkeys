@@ -7,11 +7,23 @@ body:
     id: version
     attributes:
       label: Version
-      description: What version of our software are you running?
+      description: What version of NavKeys are you using?
       options:
         - 0.5
         - 1.0 (Latest)
-      value: 1.0 (Latest)
+    validations:
+      required: true
+  - type: dropdown
+    id: browser
+    attributes:
+      label: Browser
+      description: What browser are you using?
+      options:
+        - Chrome
+        - Firefox
+        - Safari
+        - Opera
+        - Edge
     validations:
       required: true
 
