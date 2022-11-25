@@ -189,6 +189,65 @@ class NavKeys {
         }
     }
 
+    //Add an element to active_nav_elements list
+    //element - HTML element to add
+    addActiveNavElement(element){
+
+        //Validators
+        this.#validateDomEntity(element);
+
+        //Check if active_nav_elements already contains the given element, and add it if not.
+        if(!this.#active_nav_elements.includes(element)){
+            this.#active_nav_elements.push(element);
+        }
+    }
+
+    //Remove an element from active_nav_elements list
+    //element - HTML element to remove
+    removeActiveNavElement(element){
+
+        //Validators
+        this.#validateDomEntity(element);
+
+        let active_nav_elements = this.#active_nav_elements;
+        const index = active_nav_elements.indexOf(element);
+
+        if(index >= 0){
+            active_nav_elements.splice(index, 1);
+        }
+    }
+
+    //Clears the active_nav_elements list
+    clearActiveNavElements(){
+        this.#active_nav_elements = [];
+    }
+
+    //Scans and adds/removes nav_elements that are considered active.
+    scanActiveNavElements(){
+        let nav_elements = this.#nav_elements;
+
+        nav_elements.forEach(nav_element => {
+
+        })
+    }
+
+    //Check whether the given element matches the criteria to be considered acttive.
+    //element - HTML element to check.
+    matchesActive(element){
+
+        //Validators
+        this.#validateDomEntity(element);
+
+        const comp_styles = window.getComputedStyle(element);
+        const display = comp_styles.getPropertyValue("display");
+        const visibility = comp_styles.getPropertyValue("visibility");
+        
+        if(display === "none" || visibility === "hidden"){
+            return false;
+        }
+        return true;
+    }
+
     //---Public END---//
 
     //---Checkers---//
@@ -236,6 +295,7 @@ class NavKeys {
     }
 
     //Check if array contains only DOM elements
+    //array - array to check against
     #areDomEntities(array){
         if(!Array.isArray(array)){
             this.#error("Parameter must be an array!");
@@ -249,9 +309,46 @@ class NavKeys {
         return all_entities;
     }
 
+    //Check if given element's ancestors have given style
+    //element - HTML element to check
+    //property - CSS property to check - string
+    //value - value of property to check - string
+    #doAncestorsHaveStyle(element, property, value){
+        
+        //Validators
+        this.#validateDomEntity(element);
+        this.#validateType(property, "string");
+        this.#validateType(value, "string");
+
+        //Get all ancestors of element
+        const ancestors = this.#getAncestors(element);
+
+        let have_style = false;
+        //Check if any of the ancestors have given style
+        for(const ancestor of ancestors){
+            const comp_style = window.getComputedStyle(ancestor);
+            if(comp_style.getPropertyValue(property) === value){
+                have_style = true;
+                break;
+            }
+        }
+        return have_style;
+    }
+
     //---Checkers END---//
 
     //---Getters---//
+
+    //Gets all ancestors of an element
+    //element - HTML element
+    #getAncestors(element){
+        let ancestors = [];
+        while (element) {
+            ancestors.unshift(el);
+            element = element.parentNode;
+        }
+        return ancestors;
+    }
 
     //Get closest of a number of elements to a single target element. Calculating from element's center position
     //from_element - HTML element from which to calculate
@@ -478,6 +575,79 @@ class NavKeys {
     #validateType(target, type){
         if(typeof target !== type || target === null){
             this.#error("Parameter must be of type " + type + "!");
+        }
+    }
+
+    //validateType for multiple types
+    //target - target variable
+    //types - array of strings representing types to validate for
+    #validateTypes(target, types){
+
+        //Validate types
+        this.#validateArray(types);
+        this.#validateArrayType(types, "string");
+
+        let valid = true;
+        if(!types.includes(typeof target)){
+            valid = false;
+        }
+
+        if(!valid){
+            this.#error("Variable must be one of the following types: " + types.join(", "));
+        }
+        // types.forEach(type => {
+        //     //valid = false;
+        //     if(typeof target === type){
+        //         valid = true;
+        //     }
+        // })
+    }
+
+    //Validate whether given array contains only given type
+    //array - array of variables
+    //type - type to check against
+    #validateArrayType(array, type){
+
+        //Validators
+        this.#validateType(type, "string");
+
+        let valid = true;
+        array.forEach(entry => {
+            if(typeof entry !== type){
+                valid = false;
+            }
+        })
+
+        if(!valid){
+            this.#error("Array elements must be of type " + type);
+        }
+    }
+
+    //validateArrayType for multiple types
+    //array - array of variables
+    //type - type to check against
+    #validateArrayTypes(array, types){
+
+        //Validators
+        this.#validateArray(array);
+        this.#validateArray(types);
+        this.#validateArrayType(types, "string");
+
+        let valid = true;
+        array.forEach(entry => {
+            let has_invalid_type = true;
+            types.forEach(type => {
+                if(typeof entry === type){
+                    has_invalid_type = false;
+                }
+            })
+            if(has_invalid_type){
+                valid = false;
+            }
+        })
+
+        if(!valid){
+            this.#error("Array elements must be one of the following types: " + types.join(", "));
         }
     }
 
@@ -742,6 +912,10 @@ class NavKeys {
 
     //Elements that are navigatable
     #nav_elements = [];
+
+    //Currently active nav elements
+    #active_nav_elements = [];
+
     //Currently focused element
     #current_element = null;
 
