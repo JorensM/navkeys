@@ -32,7 +32,7 @@ class NavKeys {
 
     default_options = {
         mode: this.constants.mode.auto,
-        autoElements: ["a", "button", "p"]
+        autoElements: ["a", "button",]
     }
 
     //---Constructor---//
@@ -44,6 +44,7 @@ class NavKeys {
             if(options.autoElements === undefined || options.autoElements === null || !Array.isArray(options.autoElements)){
                 throw new Error("Invalid autoElements option!");
             }else{
+
                 //Add elements to nav_elements that match the options.autoElements queries
                 options.autoElements.forEach(query => {
                     //console.log("query: " + query);
@@ -69,6 +70,7 @@ class NavKeys {
                 event.keyCode === this.constants.key_code.down ||
                 event.keyCode === this.constants.key_code.right ||
                 event.keyCode === this.constants.key_code.left ){
+                    event.preventDefault();
                     const direction = this.keycodeToDirection(event.keyCode);
                     //console.log("Arrow key pressed: " + direction);
                     this.navigate(direction);
@@ -124,13 +126,40 @@ class NavKeys {
             nav_area.height = vh;
         }
 
-        target_elements = this.getElementsInsideArea(this.nav_elements, nav_area);
+        target_elements = this.getElementsInsideArea(this.nav_elements, nav_area).filter((element) => element != this.current_element);
         //console.log("Target elements: ");
         //console.log(target_elements);
         //this.draw_nav_area(nav_area);
 
-        const navigate_to = this.getClosestElementCenter(this.current_element, target_elements);
+        console.log('curr element:', this.current_element)
+        
+        let x_direction = 0;
+        let y_direction = 0;
 
+        switch(direction) {
+            case this.constants.direction.left:
+                x_direction = -1;
+                break;
+            case this.constants.direction.right:
+                x_direction = 1;
+                break;
+            case this.constants.direction.up:
+                y_direction = -1;
+                break;
+            case this.constants.direction.down:
+                y_direction = 1;
+                break;
+        }
+        const scroll_length = 100;
+
+        if(target_elements.length == 0) {
+            console.log(y_direction)
+            window.scrollBy(x_direction * scroll_length, y_direction * scroll_length);
+            return;
+        }
+
+        const navigate_to = this.getClosestElementCenter(this.current_element, target_elements);
+        console.log('target element:', navigate_to)
         this.focus(navigate_to);
 
         //console.log(nav_area);
@@ -261,6 +290,9 @@ class NavKeys {
     //from_element - HTML element from which to calculate
     //to_elements - array of HTML element to which to compare
     getClosestElementCenter(from_element, to_elements){
+        if(to_elements.length == 0) {
+            return null;
+        }
         let closest = to_elements[0];
         let closest_distance = this.distanceBetweenElementsCenter(from_element, to_elements[0]);
         to_elements.forEach(to_element => {
@@ -284,3 +316,5 @@ class NavKeys {
     //Currently focused element
     current_element = null;
 }
+
+new NavKeys();
