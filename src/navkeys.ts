@@ -48,7 +48,6 @@ class NavKeys {
                 options.autoElements.forEach(query => {
                     //console.log("query: " + query);
                     const elements = document.querySelectorAll(query);
-                    console.log('query:' + query)
                     elements.forEach(item => {
                         //console.log(item);
                         this.nav_elements.push(item);
@@ -126,15 +125,10 @@ class NavKeys {
             nav_area.height = vh;
         }
 
-        console.log(nav_area)
-
         target_elements = this.getElementsInsideArea(this.nav_elements, nav_area).filter((element) => element != this.current_element);
 
-        console.log("Target elements: ");
-        console.log(target_elements);
         this.draw_nav_area(nav_area);
 
-        console.log('curr element:', this.current_element)
         let x_direction = 0;
         let y_direction = 0;
 
@@ -162,8 +156,6 @@ class NavKeys {
 
         const navigate_to: HTMLElement | null = this.getClosestElementCenter(this.current_element, target_elements);
         if(navigate_to) {
-            console.log('target element:', navigate_to)
-            console.log(navigate_to.offsetHeight)
             this.focus(navigate_to);
             this.current_element = navigate_to;
         } else {
