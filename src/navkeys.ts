@@ -82,7 +82,7 @@ class NavKeys {
                         return;
                     }
                     event.preventDefault();
-                    const direction = this.keycodeToDirection(event.keyCode);
+                    const direction = this.keycodeToDirection(event.key);
                     //console.log("Arrow key pressed: " + direction);
                     this.navigate(direction);
             }
