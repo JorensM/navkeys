@@ -2,7 +2,7 @@
     mode: string | "auto", "manual", "mixed"
 */
 
-
+import './worker'
 
 
 //---Base class---//
@@ -31,11 +31,11 @@ class NavKeys {
 
     default_options = {
         mode: this.constants.mode.auto,
-        autoElements: ["a", "button",]
+        autoElements: ["a[href]", "button",]
     }
 
     //---Constructor---//
-    constructor(options = null){
+    constructor(options = {}){
         options = {...this.default_options, ...options}
 
         //Add nav_elements for auto/mixed modes
@@ -88,7 +88,7 @@ class NavKeys {
             return;
         }
         //console.log(this.current_element);
-        this.current_element = document.activeElement;
+        // this.current_element = document.activeElement;
 
         /*The area in which the navigation will occur
             (if direction = up, then above the current element, 
@@ -126,13 +126,15 @@ class NavKeys {
             nav_area.height = vh;
         }
 
+        console.log(nav_area)
+
         target_elements = this.getElementsInsideArea(this.nav_elements, nav_area).filter((element) => element != this.current_element);
-        //console.log("Target elements: ");
-        //console.log(target_elements);
-        //this.draw_nav_area(nav_area);
+
+        console.log("Target elements: ");
+        console.log(target_elements);
+        this.draw_nav_area(nav_area);
 
         console.log('curr element:', this.current_element)
-        
         let x_direction = 0;
         let y_direction = 0;
 
@@ -152,24 +154,45 @@ class NavKeys {
         }
         const scroll_length = 100;
 
-        if(target_elements.length == 0) {
-            console.log(y_direction)
+        // if(target_elements.length == 0) {
+        //     //console.log(y_direction)
+        //     window.scrollBy(x_direction * scroll_length, y_direction * scroll_length);
+        //     return;
+        // }
+
+        const navigate_to: HTMLElement | null = this.getClosestElementCenter(this.current_element, target_elements);
+        if(navigate_to) {
+            console.log('target element:', navigate_to)
+            console.log(navigate_to.offsetHeight)
+            this.focus(navigate_to);
+            this.current_element = navigate_to;
+        } else {
             window.scrollBy(x_direction * scroll_length, y_direction * scroll_length);
             return;
         }
-
-        const navigate_to = this.getClosestElementCenter(this.current_element, target_elements);
-        console.log('target element:', navigate_to)
-        this.focus(navigate_to);
+        
 
         //console.log(nav_area);
     }
 
     //Focus element
     //element - HTMLelement to focus
-    focus(element){
+    focus(element: HTMLElement){
         element.focus();
         this.current_element = element;
+    }
+
+    /**
+     * Run a function upwards recursively on all element's parents and the element itself
+     * @param target_element Target element
+     * @param fn Function to run on each element
+     */
+    elementsUpwardsRecursive(target_element: HTMLElement, fn: (element: HTMLElement) => void) {
+        fn(target_element)
+        const parent = target_element.parentElement;
+        if(parent) {
+            this.elementsUpwardsRecursive(parent, fn)
+        }
     }
 
     draw_nav_area(area){
@@ -286,22 +309,36 @@ class NavKeys {
         return this.distanceBetweenPoints(a_center, b_center);
     }
 
-    //Get closest of a number of elements to a single target element. Calculating from element's center position
-    //from_element - HTML element from which to calculate
-    //to_elements - array of HTML element to which to compare
-    getClosestElementCenter(from_element, to_elements){
+    /**
+     *  Get closest of a number of elements to a single target element. Calculating from element's center position
+     * 
+     *  @param from_element - HTML element from which to calculate
+     *  @param to_elements - array of HTML element to which to compare
+     */
+    getClosestElementCenter(from_element: HTMLElement, to_elements: HTMLElement[]){
         if(to_elements.length == 0) {
             return null;
         }
-        let closest = to_elements[0];
-        let closest_distance = this.distanceBetweenElementsCenter(from_element, to_elements[0]);
-        to_elements.forEach(to_element => {
+        let closest = null;
+        let closest_distance: number = this.distanceBetweenElementsCenter(from_element, to_elements[0]);
+        for (const to_element of to_elements) {
+
             const compare_distance = this.distanceBetweenElementsCenter(from_element, to_element);
-            if(compare_distance < closest_distance){
+            //console.log('element: ', to_element);
+            //console.log('height: ' + to_element.offsetHeight);
+            //console.log('width: ' + to_element.offsetWidth);
+            //console.log('visible: ' + to_element.checkVisibility())
+            if(
+                compare_distance <= closest_distance && 
+                to_element.checkVisibility() &&
+                to_element.offsetWidth > 0 &&
+                to_element.offsetHeight > 0
+            ){
                 closest_distance = compare_distance;
                 closest = to_element;
             }
-        })
+        }
+        //console.log('closest: ', closest);
         return closest;
     }
 
@@ -314,7 +351,7 @@ class NavKeys {
     //Elements that are navigatable
     nav_elements = [];
     //Currently focused element
-    current_element = null;
+    current_element: HTMLElement | null = null;
 }
 
 new NavKeys();
