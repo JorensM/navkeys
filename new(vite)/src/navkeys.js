@@ -8,7 +8,6 @@
 //---Base class---//
 class NavKeys {
 
-
     //---Constants---//
     constants = {
         mode: {
@@ -49,6 +48,7 @@ class NavKeys {
                 options.autoElements.forEach(query => {
                     //console.log("query: " + query);
                     const elements = document.querySelectorAll(query);
+                    console.log('query:' + query)
                     elements.forEach(item => {
                         //console.log(item);
                         this.nav_elements.push(item);
