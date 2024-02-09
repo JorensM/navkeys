@@ -23,3 +23,5 @@ dist_dev
 *.njsproj
 *.sln
 *.sw?
+
+*.zip
