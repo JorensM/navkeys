@@ -32,7 +32,7 @@ class NavKeys {
 
     default_options = {
         mode: this.constants.mode.auto,
-        autoElements: ["a[href]", "button", "input",]
+        autoElements: ["a[href]", "button", "input", "textarea",]
     }
 
     //---Constructor---//
@@ -72,7 +72,7 @@ class NavKeys {
                 event.key === this.constants.keys.left ||
                 event.key === this.constants.keys.unfocus){
                     const element = event.target as HTMLElement;
-                    if(element.tagName == 'input') {
+                    if(['INPUT', 'TEXTAREA', 'SELECT'].includes(element.tagName)) {
                         /**
                          * Unfocus input if unfocus key was presset
                          */
