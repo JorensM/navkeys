@@ -15,11 +15,12 @@ class NavKeys {
             manual: "manual",
             mixed: "mixed"
         },
-        key_code: {
-            left: 37,
-            up: 38,
-            right: 39,
-            down: 40
+        keys: {
+            left: 'ArrowLeft',
+            up: 'ArrowUp',
+            right: 'ArrowRight',
+            down: 'ArrowDown',
+            unfocus: 'Escape'
         },
         direction: {
             left: "left",
@@ -31,7 +32,7 @@ class NavKeys {
 
     default_options = {
         mode: this.constants.mode.auto,
-        autoElements: ["a[href]", "button",]
+        autoElements: ["a[href]", "button", "input",]
     }
 
     //---Constructor---//
@@ -64,11 +65,22 @@ class NavKeys {
             throw new Error("Invalid NavKeys mode!");
         }
 
-        window.addEventListener("keydown", event => {
-            if( event.keyCode === this.constants.key_code.up ||
-                event.keyCode === this.constants.key_code.down ||
-                event.keyCode === this.constants.key_code.right ||
-                event.keyCode === this.constants.key_code.left ){
+        window.addEventListener("keydown", (event: KeyboardEvent) => {
+            if( event.key === this.constants.keys.up ||
+                event.key === this.constants.keys.down ||
+                event.key === this.constants.keys.right ||
+                event.key === this.constants.keys.left ||
+                event.key === this.constants.keys.unfocus){
+                    const element = event.target as HTMLElement;
+                    if(element.tagName == 'input') {
+                        /**
+                         * Unfocus input if unfocus key was presset
+                         */
+                        if(event.key === this.constants.keys.unfocus) {
+                            (element as HTMLInputElement).blur();
+                        }
+                        return;
+                    }
                     event.preventDefault();
                     const direction = this.keycodeToDirection(event.keyCode);
                     //console.log("Arrow key pressed: " + direction);
