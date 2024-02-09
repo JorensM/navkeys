@@ -223,16 +223,18 @@ class NavKeys {
         return uniq;
     }
 
-    //Convert arrow key keycode to direction in string format
+    /**
+     * Convert arrow key keycode to direction in string format
+     */
     keycodeToDirection(keycode){
         switch(keycode){
-            case this.constants.key_code.up:
+            case this.constants.keys.up:
                 return this.constants.direction.up;
-            case this.constants.key_code.down:
+            case this.constants.keys.down:
                 return this.constants.direction.down;
-            case this.constants.key_code.left:
+            case this.constants.keys.left:
                 return this.constants.direction.left;
-            case this.constants.key_code.right:
+            case this.constants.keys.right:
                 return this.constants.direction.right;
         }
     }
