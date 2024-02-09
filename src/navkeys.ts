@@ -127,8 +127,9 @@ class NavKeys {
 
         target_elements = this.getElementsInsideArea(this.nav_elements, nav_area).filter((element) => element != this.current_element);
 
-        this.draw_nav_area(nav_area);
-
+        // if(this.debug) {
+        // this.draw_nav_area(nav_area);
+        // }
         let x_direction = 0;
         let y_direction = 0;
 
